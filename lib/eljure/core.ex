@@ -1,26 +1,33 @@
 defmodule Eljure.Core do
   import Kernel, except: [apply: 2]
+  alias Eljure.Scope
 
   def main do
-    IO.puts "Starting Eljure REPL..."
-    loop %{"+" => {:function, &({:integer, elem(&1,1) + elem(&2,1)})}}
+    case Mix.env do
+      :test -> ;
+      _ ->
+        IO.puts "Starting Eljure REPL..."
+        Scope.new
+        |> Scope.put("+", {:function, &({:integer, elem(&1,1) + elem(&2,1)})})
+        |> loop
+    end
   end
 
-  defp loop env do
+  defp loop scope do
     case String.strip IO.gets "eljure> " do
-      "" -> loop env
+      "" -> loop scope
 
       "quit" ->; # quit loop
 
       data ->
         try do
-          {result, newEnv} = eval read(data), env
+          {result, updated_scope} = eval read(data), scope
           print result
-          loop newEnv
-        rescue 
-          ex in RuntimeError -> 
+          loop updated_scope
+        rescue
+          ex in RuntimeError ->
             IO.puts ex.message
-            loop env
+            loop scope
         end
     end
   end
@@ -31,28 +38,31 @@ defmodule Eljure.Core do
   end
 
   # Evaluates the AST
-  def eval({:symbol, s}, env) do
-    case Map.fetch(env, s) do
-      {:ok, value} -> {value, env}
-      :error -> raise "Undefined symbol: \"#{s}\""
-    end
+  def eval({:symbol, s} = term, scope) do
+    {Scope.get(scope, s), scope}
   end
 
-  def eval({:list, [{:symbol, "def"}, {:symbol, s}, value]}, env) do
-    {evaledValue, _} = eval value, env
-    {nil, Map.put(env, s, evaledValue)}
+  def eval({:list, [{:symbol, "def"}, {:symbol, s}, value]}, scope) do
+    {evaledValue, _} = eval value, scope
+    {nil, Scope.put(scope, s, evaledValue)}
   end
 
-  def eval {:list, l} = ast, env do
-    {f, _} = eval(Enum.at(l, 0), env)
-    args = List.delete_at(l, 0) 
-            |> Enum.map(&(eval(&1, env)))
+  def eval({:list, [{:symbol, "fn"}, {:vector, args} | body]}, scope) do
+    Enum.map(args, &print/1)
+    Enum.map(body, &print/1)
+    {{:function, fn -> List.last(args) end}, scope}
+  end
+
+  def eval {:list, l} = ast, scope do
+    {f, _} = eval(Enum.at(l, 0), scope)
+    args = List.delete_at(l, 0)
+            |> Enum.map(&(eval(&1, scope)))
             |> Enum.map(&(elem(&1, 0)))
-    {apply(f, args), env}
+    {apply(f, args), scope}
   end
 
-  def eval ast, env do
-    {ast, env}
+  def eval ast, scope do
+    {ast, scope}
   end
 
   def apply {:function, f}, args do
@@ -65,30 +75,6 @@ defmodule Eljure.Core do
 
   # Prints the resulting value
   def print result do
-    IO.puts as_string result
+    IO.puts Eljure.Repr.show result
   end
-
-  def as_string(nil), do: "nil"
-  def as_string(true), do: "true"
-  def as_string(false), do: "false"
-  def as_string({:symbol, s}), do: to_string(s)
-  def as_string({:integer, i}), do: to_string(i)
-  def as_string({:string, s}), do: "\"#{s}\""
-  def as_string({:keyword, k}), do: ":#{k}"
-  def as_string({:list, list}) do
-    "(#{list |> Enum.map(&as_string/1)
-             |> Enum.join(" ")})"
-  end
-  def as_string({:vector, vector}) do
-    "[#{vector |> Enum.map(&as_string/1)
-               |> Enum.join(" ")}]"
-  end
-  def as_string({:map, map}) do
-    "{#{map |> Enum.flat_map(fn {k, v} -> [as_string(k), as_string(v)] end)
-        |> Enum.join(" ")}}"
-  end
-  def as_string x do
-    to_string(x) <> " !!not atom!!"
-  end
-
 end
