@@ -1,6 +1,8 @@
 defmodule Eljure.Core do
   import Kernel, except: [apply: 2]
+  alias Eljure.Reader
   alias Eljure.Scope
+  alias Eljure.Repr
 
   def main do
     case Mix.env do
@@ -34,7 +36,7 @@ defmodule Eljure.Core do
 
   # Reads input from stdio, parses and returns ast
   def read code do
-    Eljure.Reader.read code
+    Reader.read code
   end
 
   # Evaluates the AST
@@ -75,6 +77,6 @@ defmodule Eljure.Core do
 
   # Prints the resulting value
   def print result do
-    IO.puts Eljure.Repr.show result
+    IO.puts Repr.show result
   end
 end
