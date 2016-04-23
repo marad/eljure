@@ -10,7 +10,7 @@ defmodule Eljure.Core do
       _ ->
         IO.puts "Starting Eljure REPL..."
         Scope.new
-        |> Scope.put("+", {:function, &({:integer, elem(&1,1) + elem(&2,1)})})
+        |> Scope.put("+", {:function, &({:integer, elem(Enum.at(&1, 0),1) + elem(Enum.at(&1, 1),1)})})
         |> loop
     end
   end
@@ -40,7 +40,7 @@ defmodule Eljure.Core do
   end
 
   # Evaluates the AST
-  def eval({:symbol, s} = term, scope) do
+  def eval({:symbol, s}, scope) do
     {Scope.get(scope, s), scope}
   end
 
@@ -50,12 +50,10 @@ defmodule Eljure.Core do
   end
 
   def eval({:list, [{:symbol, "fn"}, {:vector, args} | body]}, scope) do
-    Enum.map(args, &print/1)
-    Enum.map(body, &print/1)
-    {{:function, fn -> List.last(args) end}, scope}
+    {{:function, &(invoke_fn args, body, scope, &1)}, scope}
   end
 
-  def eval {:list, l} = ast, scope do
+  def eval {:list, l}, scope do
     {f, _} = eval(Enum.at(l, 0), scope)
     args = List.delete_at(l, 0)
             |> Enum.map(&(eval(&1, scope)))
@@ -67,12 +65,20 @@ defmodule Eljure.Core do
     {ast, scope}
   end
 
-  def apply {:function, f}, args do
-    Kernel.apply(f, args)
+  def invoke_fn argvec, body, scope, args do
+    func_scope = List.foldl(
+      Enum.zip(argvec, args), 
+      Scope.child(scope), 
+      fn {{:symbol, sym}, arg}, acc ->
+        Scope.put(acc, sym, arg)
+      end)
+      
+    elem(List.last(body |> Enum.map(&(eval &1, func_scope))), 0)
   end
 
-  def apply head, args do
-    print(head)
+
+  def apply {:function, f}, args do
+    Kernel.apply(f, [args])
   end
 
   # Prints the resulting value

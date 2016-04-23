@@ -34,7 +34,7 @@ defmodule EljureTest.Scope do
   test "should not propagate child scope symbols to parent scope" do
     # given
     parent_scope = Scope.new
-    child_scope = Scope.put(Scope.child(parent_scope), :key, :value)
+    Scope.put(Scope.child(parent_scope), :key, :value)
 
     # expect
     assert_raise RuntimeError, "Undefined symbol: \"key\"", fn ->

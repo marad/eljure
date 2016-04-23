@@ -4,6 +4,10 @@ defmodule EljureTest.Core do
   import Eljure.Core
   alias Eljure.Scope
 
+  defp sumFunc args do
+    {:integer, elem(Enum.at(args,0), 1) + elem(Enum.at(args,1), 1)}
+  end
+
   test "should eval symbol to it's value" do
     scope = Scope.put(Scope.new, "number", {:integer, 42})
     assert {{:integer, 42}, scope} == eval {:symbol, "number"}, scope
@@ -34,7 +38,7 @@ defmodule EljureTest.Core do
   test "should eval lists as functions" do
     # given
     scope = %{
-      "+" => {:function, &({:integer, elem(&1, 1) + elem(&2, 1)})},
+      "+" => {:function, &sumFunc/1},
       "a" => {:integer, 1},
       "b" => {:integer, 2}
     }
@@ -52,7 +56,7 @@ defmodule EljureTest.Core do
 
   test "'def' should eval value to be set" do
     # given
-    scope = Scope.put(Scope.new, "+", {:function, &({:integer, elem(&1, 1) + elem(&2, 1)})})
+    scope = Scope.put(Scope.new, "+", {:function, &sumFunc/1})
     expr = read("(def sym (+ 1 2))")
 
     # when
@@ -63,17 +67,17 @@ defmodule EljureTest.Core do
     assert updated_scope == Map.put(scope, "sym", {:integer, 3})
   end
 
-  #test "'fn' should create a function" do
-  #  # given
-  #  env = %{}
-  #  expr = read("(fn [a] a)")
+  test "'fn' should create a function" do
+    # given
+    env = %{}
+    expr = read("((fn [a] a) 5)")
 
-  #  # when
-  #  {result, updatedEnv} = eval expr, env
+    # when
+    {result, updatedEnv} = eval expr, env
 
-  #  # then
-  #  assert env == updatedEnv
-  #  assert {:integer, 5} == Kernel.apply(result, [{:integer, 5}])
-  #end
+    # then
+    assert env == updatedEnv
+    assert {:integer, 5} == result
+  end
   
 end
