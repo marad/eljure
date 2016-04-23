@@ -16,7 +16,7 @@ defmodule EljureTest.Types do
   end
 
   test "converting function to eljure function" do
-    func = native_to_ast(fn x -> x + 1 end)
-    assert {:integer, 6} == Eljure.Evaluator.apply(func, [{:integer, 5}])
+    inc = native_to_ast(fn x -> x + 1 end)
+    assert {:integer, 6} == Eljure.Evaluator.apply(inc, [{:integer, 5}])
   end
 end
