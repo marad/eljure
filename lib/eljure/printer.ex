@@ -1,4 +1,4 @@
-defmodule Eljure.Repr do
+defmodule Eljure.Printer do
   def show(nil), do: "nil"
   def show(true), do: "true"
   def show(false), do: "false"

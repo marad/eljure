@@ -2,6 +2,7 @@ defmodule Eljure.Main do
   alias Eljure.Scope
   alias Eljure.Core
   alias Eljure.Reader
+  alias Eljure.Printer
 
   def start do
     case Mix.env do
@@ -23,7 +24,7 @@ defmodule Eljure.Main do
       data ->
         try do
           {result, updated_scope} = Core.eval Reader.read(data), scope
-          Core.print result
+          print result
           loop updated_scope
         rescue
           ex in RuntimeError ->
@@ -35,6 +36,10 @@ defmodule Eljure.Main do
 
   defp prompt do
     "eljure> " |> IO.gets |> String.strip
+  end
+
+  defp print term do
+    IO.puts Printer.show term
   end
 
 end

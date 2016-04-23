@@ -2,7 +2,7 @@ defmodule Eljure.Core do
   import Kernel, except: [apply: 2]
   alias Eljure.Reader
   alias Eljure.Scope
-  alias Eljure.Repr
+  alias Eljure.Printer
 
   # Evaluates the AST
   def eval({:symbol, s}, scope) do
@@ -43,10 +43,5 @@ defmodule Eljure.Core do
 
   def apply {:function, f}, args do
     Kernel.apply(f, [args])
-  end
-
-  # Prints the resulting value
-  def print result do
-    IO.puts Repr.show result
   end
 end
