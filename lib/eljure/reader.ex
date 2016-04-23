@@ -60,9 +60,9 @@ defmodule Eljure.Reader do
   end
 
   defp read_atom("nil"), do: nil
-  defp read_atom("true"), do: true
-  defp read_atom("false"), do: false
-  defp read_atom(":" <> tail), do: {:keyword, String.to_atom tail}
+  defp read_atom("true"), do: {:boolean, true}
+  defp read_atom("false"), do: {:boolean, false}
+  defp read_atom(":" <> tail), do: {:keyword, tail}
   defp read_atom(token) do
     cond do
       String.starts_with?(token, "\"") and String.ends_with?(token, "\"") ->

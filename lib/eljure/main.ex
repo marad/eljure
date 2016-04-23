@@ -3,6 +3,7 @@ defmodule Eljure.Main do
   alias Eljure.Core
   alias Eljure.Reader
   alias Eljure.Printer
+  alias Eljure.Evaluator
 
   def start do
     case Mix.env do
@@ -24,7 +25,7 @@ defmodule Eljure.Main do
 
       data ->
         try do
-          {result, updated_scope} = Core.eval Reader.read(data), scope
+          {result, updated_scope} = Evaluator.eval Reader.read(data), scope
           print result
           loop updated_scope
         rescue

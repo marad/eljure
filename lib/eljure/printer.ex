@@ -1,7 +1,7 @@
 defmodule Eljure.Printer do
   def show(nil), do: "nil"
-  def show(true), do: "true"
-  def show(false), do: "false"
+  def show({:boolean, true}), do: "true"
+  def show({:boolean, false}), do: "false"
   def show({:symbol, s}), do: to_string(s)
   def show({:integer, i}), do: to_string(i)
   def show({:string, s}), do: "\"#{s}\""
