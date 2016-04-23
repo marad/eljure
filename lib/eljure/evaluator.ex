@@ -18,6 +18,14 @@ defmodule Eljure.Evaluator do
     {{:function, &(invoke_fn args, body, scope, &1)}, scope}
   end
 
+  def eval({:list, [{:symbol, "let"}, {:vector, args} | body]}, scope) do
+    let_scope = Enum.reduce(Enum.chunk(args, 2), Scope.child(scope), fn [{:symbol, sym}, val], sc ->
+      Scope.put(sc, sym, elem(eval(val, sc), 0))
+    end)
+    result = elem(List.last(body |> Enum.map(&(eval &1, let_scope))), 0)
+    {result, scope}
+  end
+
   def eval {:list, [{:symbol, "."}, {:symbol, func_name} | arg_list]}, scope do
     args = arg_list
            |> Enum.map(&(eval(&1, scope)))

@@ -82,6 +82,20 @@ defmodule EljureTest.Evaluator do
     assert {:integer, 5} == result
   end
 
+  test "'let' should create it's scope" do
+    # given
+    scope = Scope.put(Scope.new, "+", {:function, &sumFunc/1})
+    expr = Reader.read "(let [a 5 b (+ a 1)] b)"
+
+    # when
+    {result, updated_scope} = eval expr, scope
+
+    # then
+    assert scope == updated_scope
+    assert {:integer, 6} == result
+
+  end
+
   test "calling native elixir functions" do
     # given
     scope = Scope.new
