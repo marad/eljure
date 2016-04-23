@@ -4,11 +4,6 @@ defmodule Eljure.Core do
   alias Eljure.Scope
   alias Eljure.Repr
 
-  # Reads input from stdio, parses and returns ast
-  def read code do
-    Reader.read code
-  end
-
   # Evaluates the AST
   def eval({:symbol, s}, scope) do
     {Scope.get(scope, s), scope}

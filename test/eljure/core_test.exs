@@ -3,6 +3,7 @@ defmodule EljureTest.Core do
   doctest Eljure.Core
   import Eljure.Core
   alias Eljure.Scope
+  alias Eljure.Reader
 
   defp sumFunc args do
     {:integer, elem(Enum.at(args,0), 1) + elem(Enum.at(args,1), 1)}
@@ -57,7 +58,7 @@ defmodule EljureTest.Core do
   test "'def' should eval value to be set" do
     # given
     scope = Scope.put(Scope.new, "+", {:function, &sumFunc/1})
-    expr = read("(def sym (+ 1 2))")
+    expr = Reader.read("(def sym (+ 1 2))")
 
     # when
     {result, updated_scope} = eval expr, scope
@@ -70,7 +71,7 @@ defmodule EljureTest.Core do
   test "'fn' should create a function" do
     # given
     env = %{}
-    expr = read("((fn [a] a) 5)")
+    expr = Reader.read("((fn [a] a) 5)")
 
     # when
     {result, updatedEnv} = eval expr, env

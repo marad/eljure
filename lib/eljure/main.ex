@@ -1,6 +1,7 @@
 defmodule Eljure.Main do
   alias Eljure.Scope
   alias Eljure.Core
+  alias Eljure.Reader
 
   def start do
     case Mix.env do
@@ -14,14 +15,14 @@ defmodule Eljure.Main do
   end
 
   defp loop scope do
-    case String.strip IO.gets "eljure> " do
+    case prompt do
       "" -> loop scope
 
       "quit" ->; # quit loop
 
       data ->
         try do
-          {result, updated_scope} = Core.eval Core.read(data), scope
+          {result, updated_scope} = Core.eval Reader.read(data), scope
           Core.print result
           loop updated_scope
         rescue
@@ -30,6 +31,10 @@ defmodule Eljure.Main do
             loop scope
         end
     end
+  end
+
+  defp prompt do
+    "eljure> " |> IO.gets |> String.strip
   end
 
 end
