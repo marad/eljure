@@ -96,6 +96,19 @@ defmodule EljureTest.Evaluator do
 
   end
 
+  test "'do' should eval list and return last value" do
+    # given
+    scope = Scope.new
+    expr = Reader.read "(do (def a 5) a)"
+
+    # when
+    {result, updated_scope} = eval expr, scope
+
+    # then
+    assert %{"a" => {:integer, 5}} == updated_scope
+    assert {:integer, 5} == result
+  end
+
   test "calling native elixir functions" do
     # given
     scope = Scope.new

@@ -26,6 +26,12 @@ defmodule Eljure.Evaluator do
     {result, scope}
   end
 
+  def eval({:list, [{:symbol, "do"} | body]}, scope) do
+    Enum.reduce(body, {nil, scope}, fn form, {_, sc} ->
+      eval form, sc
+    end)
+  end
+
   def eval {:list, [{:symbol, "."}, {:symbol, func_name} | arg_list]}, scope do
     args = arg_list
            |> Enum.map(&(eval(&1, scope)))
