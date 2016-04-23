@@ -4,36 +4,6 @@ defmodule Eljure.Core do
   alias Eljure.Scope
   alias Eljure.Repr
 
-  def main do
-    case Mix.env do
-      :test -> ;
-      _ ->
-        IO.puts "Starting Eljure REPL..."
-        Scope.new
-        |> Scope.put("+", {:function, &({:integer, elem(Enum.at(&1, 0),1) + elem(Enum.at(&1, 1),1)})})
-        |> loop
-    end
-  end
-
-  defp loop scope do
-    case String.strip IO.gets "eljure> " do
-      "" -> loop scope
-
-      "quit" ->; # quit loop
-
-      data ->
-        try do
-          {result, updated_scope} = eval read(data), scope
-          print result
-          loop updated_scope
-        rescue
-          ex in RuntimeError ->
-            IO.puts ex.message
-            loop scope
-        end
-    end
-  end
-
   # Reads input from stdio, parses and returns ast
   def read code do
     Reader.read code
@@ -75,7 +45,6 @@ defmodule Eljure.Core do
       
     elem(List.last(body |> Enum.map(&(eval &1, func_scope))), 0)
   end
-
 
   def apply {:function, f}, args do
     Kernel.apply(f, [args])
