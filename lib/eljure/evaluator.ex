@@ -32,6 +32,18 @@ defmodule Eljure.Evaluator do
     end)
   end
 
+  def eval({:list, [{:symbol, "if"} | args]} = form, scope) do
+    case args do
+      [cond_form, true_form, false_form] ->
+        case eval(cond_form, scope) do
+          {{:boolean, false}, _} -> eval(false_form, scope)
+          {nil, _} -> eval(false_form, scope)
+          _ -> eval(true_form, scope)
+        end
+      _ -> raise "Invalid 'if' expression: #{show form}"
+    end
+  end
+
   def eval {:list, [{:symbol, "."}, {:symbol, func_name} | arg_list]}, scope do
     args = arg_list
            |> Enum.map(&(eval(&1, scope)))

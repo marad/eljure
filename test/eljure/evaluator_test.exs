@@ -109,6 +109,15 @@ defmodule EljureTest.Evaluator do
     assert {:integer, 5} == result
   end
 
+  test "'if' special form" do
+    scope = Scope.new
+            |> Scope.put("t", {:integer, 1})
+            |> Scope.put("f", {:integer, 0})
+    assert {{:integer, 1}, scope} == eval(Reader.read("(if true t f)"), scope)
+    assert {{:integer, 0}, scope} == eval(Reader.read("(if false t f)"), scope)
+    assert {{:integer, 0}, scope} == eval(Reader.read("(if nil t f)"), scope)
+  end
+
   test "calling native elixir functions" do
     # given
     scope = Scope.new
