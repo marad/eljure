@@ -4,21 +4,16 @@ defmodule EljureTest.Scope do
   alias Eljure.Scope
 
   test "should create empty scope" do
-    assert %{} == Scope.new
+    assert true == Scope.empty?(Scope.new)
   end
 
   test "should create scope from map" do
     map = %{:key => :value}
-    assert map == Scope.from map
+    assert true == Scope.has_symbol?(Scope.new(map), :key)
   end
 
-  test "should put symbol in scope" do
-    scope = Scope.new
-    assert %{"symbol" => :value} == Scope.put(scope, "symbol", :value)
-  end
-
-  test "should get symbol from scope" do
-    scope = Scope.put(Scope.new, "symbol", :value)    
+  test "should put and get symbol from scope" do
+    scope = Scope.put(Scope.new, "symbol", :value)
     assert :value == Scope.get(scope, "symbol")
   end
 
@@ -46,6 +41,15 @@ defmodule EljureTest.Scope do
     assert_raise RuntimeError, "Undefined symbol: \"key\"", fn ->
       Scope.get(Scope.new, :key)
     end
+  end
+
+  test "child scope returning updated value from parent scope" do
+    parent = Scope.new(%{"key" => :value})
+    child = Scope.child(parent)
+
+    Scope.put(parent, "key", :other)
+
+    assert :other == Scope.get(child, "key")
   end
 
 end

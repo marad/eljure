@@ -38,11 +38,11 @@ defmodule EljureTest.Evaluator do
 
   test "should eval lists as functions" do
     # given
-    scope = %{
+    scope = Scope.new(%{
       "+" => {:function, &sumFunc/1},
       "a" => {:integer, 1},
       "b" => {:integer, 2}
-    }
+    })
     expr = {:list, [{:symbol, "+"}, {:symbol, "a"}, {:symbol, "b"}]}
 
     # then
@@ -51,9 +51,9 @@ defmodule EljureTest.Evaluator do
 
   test "'def' should define variables" do
     scope = Scope.new
-    #expr = {:list, [{:symbol, "def"}, {:symbol, "sym"}, {:integer, 5}]}
     expr = Reader.read "(def sym 5)"
-    assert {nil, %{"sym" => {:integer, 5}}} == eval expr, scope
+    eval expr, scope
+    assert {:integer, 5} == Scope.get(scope, "sym")
   end
 
   test "'def' should eval value to be set" do
@@ -66,7 +66,8 @@ defmodule EljureTest.Evaluator do
 
     #then
     assert result == nil
-    assert updated_scope == Map.put(scope, "sym", {:integer, 3})
+    assert updated_scope == scope
+    assert {:integer, 3} == Scope.get(updated_scope, "sym")
   end
 
   test "'fn' should create a function" do
@@ -105,7 +106,7 @@ defmodule EljureTest.Evaluator do
     {result, updated_scope} = eval expr, scope
 
     # then
-    assert %{"a" => {:integer, 5}} == updated_scope
+    assert {:integer, 5} == Scope.get(updated_scope, "a")
     assert {:integer, 5} == result
   end
 
