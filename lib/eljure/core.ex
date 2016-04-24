@@ -12,6 +12,7 @@ defmodule Eljure.Core do
       "read-string" => {:function, &read_string/1},
       "slurp" => {:function, &slurp/1},
       "println" => {:function, &println/1},
+      "cons" => {:function, &cons/1},
     }
   end
 
@@ -52,6 +53,14 @@ defmodule Eljure.Core do
               |> Enum.join(" ")
 
     native_to_ast(IO.puts to_show)
+  end
+
+  def cons args do
+    case args do
+      [value, {type, []}] -> {type, [value]}
+      [value, {type, [_ | _] = list}] -> {type, [value | list]}
+      _ -> raise "Invalid arguments! Expected value and a list."
+    end
   end
 
 end
