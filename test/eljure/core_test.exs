@@ -31,7 +31,11 @@ defmodule EljureTest.Core do
   end
 
   test "concat should concatenate lists" do
-
+    assert list([]) == concat([ list([]), list([]) ])
+    assert list([int(5)]) == concat([ list([int(5)]), list([]) ])
+    assert list([int(6)]) == concat([ list([]), list([int(6)]) ])
+    assert list([int(5), int(6)]) == concat([ list([int(5)]), list([int(6)]) ])
+    assert list([int(5), int(6), int(7)]) == concat([ list([int(5)]), list([int(6)]), list([int(7)]) ])
   end
 
 end

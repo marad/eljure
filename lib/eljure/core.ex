@@ -13,6 +13,7 @@ defmodule Eljure.Core do
       "slurp" => {:function, &slurp/1},
       "println" => {:function, &println/1},
       "cons" => {:function, &cons/1},
+      "concat" => {:function, &concat/1},
     }
   end
 
@@ -61,6 +62,13 @@ defmodule Eljure.Core do
       [value, {type, [_ | _] = list}] -> {type, [value | list]}
       _ -> raise "Invalid arguments! Expected value and a list."
     end
+  end
+
+  def concat args do
+    result = args
+             |> Enum.map(&value/1)
+             |> Enum.reduce(&(&2 ++ &1))
+   {:list, result}
   end
 
 end
