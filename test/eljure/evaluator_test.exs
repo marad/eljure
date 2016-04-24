@@ -119,6 +119,25 @@ defmodule EljureTest.Evaluator do
     assert {{:integer, 0}, scope} == eval(Reader.read("(if nil t f)"), scope)
   end
 
+  test "'eval' should evaluate ast" do
+    scope = Scope.new %{
+      "+" => {:function, &sumFunc/1},
+      "a" => {:integer, 5}
+    }
+    expr = Reader.read "(eval (+ a 1))"
+    assert  {{:integer, 6}, scope} == eval(expr, scope)
+  end
+
+  test "'eval' should evaluate ast from symbol" do
+    scope = Scope.new %{
+      "+" => {:function, &sumFunc/1},
+      "a" => {:integer, 5},
+      "ast" => Reader.read("(+ a 1)"),
+    }
+    expr = Reader.read "(eval ast)"
+    assert {{:integer, 6}, scope} == eval(expr, scope)
+  end
+
   test "calling native elixir functions" do
     # given
     scope = Scope.new

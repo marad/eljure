@@ -44,6 +44,16 @@ defmodule Eljure.Evaluator do
     end
   end
 
+  def eval({:list, [{:symbol, "eval"} | args]}, scope) do
+    case args do
+      [{:symbol, _} = sym | _] ->
+        {ast, _} = eval(sym, scope)
+        eval(ast, scope)
+      [form | _] -> eval(form, scope)
+      _ -> raise "One argument is required"
+    end
+  end
+
   def eval {:list, [{:symbol, "."}, {:symbol, func_name} | arg_list]}, scope do
     args = arg_list
            |> Enum.map(&(eval(&1, scope)))
@@ -77,12 +87,12 @@ defmodule Eljure.Evaluator do
 
   def invoke_fn argvec, body, scope, args do
     func_scope = List.foldl(
-      Enum.zip(argvec, args), 
-      Scope.child(scope), 
+      Enum.zip(argvec, args),
+      Scope.child(scope),
       fn {{:symbol, sym}, arg}, acc ->
         Scope.put(acc, sym, arg)
       end)
-      
+
     elem(List.last(body |> Enum.map(&(eval &1, func_scope))), 0)
   end
 
