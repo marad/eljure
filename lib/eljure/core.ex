@@ -1,5 +1,6 @@
 defmodule Eljure.Core do
   alias Eljure.Scope
+  import Eljure.Printer
   import Eljure.Types
 
   def create_root_scope do
@@ -10,6 +11,7 @@ defmodule Eljure.Core do
       "/"=> {:function, &divide/1},
       "read-string" => {:function, &read_string/1},
       "slurp" => {:function, &slurp/1},
+      "println" => {:function, &println/1},
     }
   end
 
@@ -42,6 +44,14 @@ defmodule Eljure.Core do
       {:ok, body} -> {:string, body}
       _ -> raise "No file #{file_name}"
     end
+  end
+
+  def println args do
+    to_show = args
+              |> Enum.map(&as_string/1)
+              |> Enum.join(" ")
+
+    native_to_ast(IO.puts to_show)
   end
 
 end

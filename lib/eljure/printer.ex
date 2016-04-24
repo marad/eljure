@@ -22,4 +22,12 @@ defmodule Eljure.Printer do
   def show x do
     to_string(x) <> " !!not atom!!"
   end
+
+  def as_string {:string, s} do
+    s
+  end
+
+  def as_string x do
+    show x
+  end
 end
