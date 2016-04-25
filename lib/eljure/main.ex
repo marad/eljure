@@ -10,9 +10,6 @@ defmodule Eljure.Main do
       :test -> ;
       _ ->
         IO.puts "Starting Eljure REPL..."
-        #Scope.new
-        #|> Scope.put("+", {:function, &({:integer, elem(Enum.at(&1, 0),1) + elem(Enum.at(&1, 1),1)})})
-        #|> loop
         loop Core.create_root_scope
     end
   end
