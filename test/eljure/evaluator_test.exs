@@ -65,7 +65,7 @@ defmodule EljureTest.Evaluator do
     {result, updated_scope} = eval expr, scope
 
     #then
-    assert result == nil
+    assert result == {:symbol, "sym"}
     assert updated_scope == scope
     assert {:integer, 3} == Scope.get(updated_scope, "sym")
   end

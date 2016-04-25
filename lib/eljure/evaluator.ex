@@ -4,14 +4,13 @@ defmodule Eljure.Evaluator do
   import Eljure.Types
   import Eljure.Printer
 
-  # Evaluates the AST
-  def eval({:symbol, s}, scope) do
-    {Scope.get(scope, s), scope}
+  def eval({:list, []} = ast, scope) do
+    {ast, scope}
   end
 
-  def eval({:list, [{:symbol, "def"}, {:symbol, s}, value]}, scope) do
+  def eval({:list, [{:symbol, "def"}, {:symbol, s}=symbol, value]}, scope) do
     {evaledValue, _} = eval value, scope
-    {nil, Scope.put(scope, s, evaledValue)}
+    {symbol, Scope.put(scope, s, evaledValue)}
   end
 
   def eval({:list, [{:symbol, "fn"}, {:vector, args} | body]}, scope) do
@@ -44,16 +43,6 @@ defmodule Eljure.Evaluator do
     end
   end
 
-  def eval({:list, [{:symbol, "eval"} | args]}, scope) do
-    case args do
-      [{:symbol, _} = sym | _] ->
-        {ast, _} = eval(sym, scope)
-        eval(ast, scope)
-      [form | _] -> eval(form, scope)
-      _ -> raise "One argument is required"
-    end
-  end
-
   def eval({:list, [{:symbol, "quote"} | args]}, scope) do
     case args do
       [form] -> {form, scope}
@@ -71,28 +60,47 @@ defmodule Eljure.Evaluator do
     {invoke_native("#{func_name} #{args}"), scope}
   end
 
-  def eval {:list, [{:symbol, "elixir-eval"}, {:string, code}]}, scope do
-    {invoke_native(code), scope}
+  #def eval {:list, [{:symbol, "elixir-eval"}, {:string, code}]}, scope do
+  #  {invoke_native(code), scope}
+  #end
+
+  def eval({:list, [{:symbol, "eval"} | args]}, scope) do
+    case args do
+      [ast] -> 
+        {evaled_ast, _} = eval(ast, scope)
+        eval(evaled_ast, scope)
+      _ -> "Arity exception! Expected one argument."
+    end
   end
 
-  def eval {:list, [func_name | arg_list]}, scope do
-    {f, _} = eval(func_name, scope)
-    args = arg_list
-            |> Enum.map(&(eval(&1, scope)))
-            |> Enum.map(&(elem(&1, 0)))
-    {apply(f, args), scope}
+  def eval({:list, _} = ast, scope) do
+    {[f | args], updated_scope} = eval_ast(ast, scope)
+    { apply(f, args), scope }
   end
 
-  def eval ast, scope do
+
+  def eval(ast, scope) do
+    eval_ast(ast, scope)
+  end
+
+  def eval_ast({:symbol, symbol}, scope) do
+    {Scope.get(scope, symbol), scope}
+  end
+
+  def eval_ast({:list, list}, scope) do
+    {Enum.map(list, &(elem(eval(&1, scope), 0))), scope}
+  end
+
+  def eval_ast(ast, scope) do
     {ast, scope}
   end
 
-  def invoke_native code do
+  defp invoke_native code do
     {result, _} = Code.eval_string code
     native_to_ast(result)
   end
 
-  def invoke_fn argvec, body, scope, args do
+  defp invoke_fn argvec, body, scope, args do
     func_scope = List.foldl(
       Enum.zip(argvec, args),
       Scope.child(scope),
