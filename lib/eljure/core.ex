@@ -14,6 +14,7 @@ defmodule Eljure.Core do
       "println" => {:function, &println/1},
       "cons" => {:function, &cons/1},
       "concat" => {:function, &concat/1},
+      "str" => {:function, &str/1},
     }
   end
 
@@ -69,6 +70,13 @@ defmodule Eljure.Core do
              |> Enum.map(&value/1)
              |> Enum.reduce(&(&2 ++ &1))
    {:list, result}
+  end
+
+  def str args do
+    {:string,
+     args
+     |> Enum.map(&as_string/1)
+     |> Enum.join("")}
   end
 
 end

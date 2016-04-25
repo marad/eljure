@@ -74,7 +74,7 @@ defmodule Eljure.Evaluator do
   end
 
   def eval({:list, _} = ast, scope) do
-    {[f | args], updated_scope} = eval_ast(ast, scope)
+    {[f | args], _} = eval_ast(ast, scope)
     { apply(f, args), scope }
   end
 

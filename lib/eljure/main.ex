@@ -1,16 +1,18 @@
 defmodule Eljure.Main do
-  alias Eljure.Scope
   alias Eljure.Core
   alias Eljure.Reader
   alias Eljure.Printer
   alias Eljure.Evaluator
+  alias Eljure.Prelude
 
   def start do
     case Mix.env do
       :test -> ;
       _ ->
         IO.puts "Starting Eljure REPL..."
-        loop Core.create_root_scope
+        Core.create_root_scope
+        |> Prelude.init
+        |> loop
     end
   end
 
