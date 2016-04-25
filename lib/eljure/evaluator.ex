@@ -54,6 +54,13 @@ defmodule Eljure.Evaluator do
     end
   end
 
+  def eval({:list, [{:symbol, "quote"} | args]}, scope) do
+    case args do
+      [form] -> {form, scope}
+      _ -> raise "Expected one argument."
+    end
+  end
+
   def eval {:list, [{:symbol, "."}, {:symbol, func_name} | arg_list]}, scope do
     args = arg_list
            |> Enum.map(&(eval(&1, scope)))

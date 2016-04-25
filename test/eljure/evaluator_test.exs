@@ -138,6 +138,12 @@ defmodule EljureTest.Evaluator do
     assert {{:integer, 6}, scope} == eval(expr, scope)
   end
 
+  test "'quote' should return unevaluated first form" do
+    scope = Scope.new
+    expr = Reader.read "(quote (1 2))"
+    assert {{:list, [{:integer, 1}, {:integer, 2}]}, scope} == eval(expr, scope)
+  end
+
   test "calling native elixir functions" do
     # given
     scope = Scope.new
