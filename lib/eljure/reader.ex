@@ -1,5 +1,7 @@
 defmodule Eljure.Reader do
 
+  import Eljure.Types
+
   # This module is based on MAL code:
   # https://github.com/kanaka/mal/blob/master/elixir/lib/mal/reader.ex
 
@@ -23,27 +25,28 @@ defmodule Eljure.Reader do
       "(" -> read_list(tokens)
       "[" -> read_vector(tokens)
       "{" -> read_map(tokens)
+      "'" -> read_quote(tokens)
       _ -> 
         { read_atom(next), rest }
     end
   end
 
   defp read_list(tokens) do
-    {list, rest} = read_sequence(List.delete_at(tokens, 0), [], ")")
-    { {:list, list}, rest }
+    { l, rest } = read_sequence(List.delete_at(tokens, 0), [], ")")
+    { list(l), rest }
   end
 
   defp read_vector(tokens) do
-    {vector, rest} = read_sequence(List.delete_at(tokens, 0), [], "]")
-   { {:vector, vector}, rest }
+    { v, rest } = read_sequence(List.delete_at(tokens, 0), [], "]")
+    { vector(v), rest }
   end
 
   defp read_map(tokens) do
-    {map, rest} = read_sequence(List.delete_at(tokens, 0), [], "}")
+    { m, rest } = read_sequence(List.delete_at(tokens, 0), [], "}")
    
-    {{:map, map 
-      |> Enum.chunk(2)
-      |> Enum.into(%{}, fn [k, v] -> {k, v} end) }, rest }
+    { map(m 
+          |> Enum.chunk(2)
+          |> Enum.into(%{}, fn [k, v] -> {k, v} end) ), rest }
   end
 
   defp read_sequence([], _acc, stop) do
@@ -54,28 +57,32 @@ defmodule Eljure.Reader do
     case head do
       ^stop -> { Enum.reverse(acc), tail }
       _ ->
-        {value, rest} = read_form(tokens)
+        { value, rest } = read_form(tokens)
         read_sequence(rest, [value | acc], stop)
     end
   end
 
+  defp read_quote([_ | tokens]) do
+    { form, rest } = read_form(tokens)
+    { list([{:symbol, "quote"}, form]), rest }
+  end
+
   defp read_atom("nil"), do: nil
-  defp read_atom("true"), do: {:boolean, true}
-  defp read_atom("false"), do: {:boolean, false}
-  defp read_atom(":" <> tail), do: {:keyword, tail}
+  defp read_atom("true"), do: bool(true)
+  defp read_atom("false"), do: bool(false)
+  defp read_atom(":" <> tail), do: keyword(tail)
   defp read_atom(token) do
     cond do
       String.starts_with?(token, "\"") and String.ends_with?(token, "\"") ->
-        {:string, token
-        |> String.slice(1..-2)
-        |> String.replace("\\\\", "\\")}
+        string(token
+               |> String.slice(1..-2)
+               |> String.replace("\\\\", "\\"))
 
       is_integer?(token) ->
-        {:integer, Integer.parse(token)
-        |> elem(0)}
+        int(Integer.parse(token) |> elem(0))
 
       true ->
-        {:symbol, token}
+        symbol(token)
     end
   end
   

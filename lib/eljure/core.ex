@@ -23,19 +23,20 @@ defmodule Eljure.Core do
   end
 
   def plus args do
-    {:integer, Enum.reduce(values(args), &+/2)}
+    int( Enum.reduce(values(args), &+/2) )
   end
 
   def minus args do
-    {:integer, Enum.reduce(values(args), &(&2 - &1))}
+    int( Enum.reduce(values(args), &(&2 - &1)) )
   end
 
   def mult args do
-    {:integer, Enum.reduce(values(args), &*/2)}
+    int( Enum.reduce(values(args), &*/2) )
   end
 
   def divide args do
-    {:integer, Enum.reduce(values(args), &(div &2, &1))}
+    int( Enum.reduce(values(args), &(div &2, &1)) )
+
   end
 
   def read_string [str_expr | _] do
@@ -44,7 +45,7 @@ defmodule Eljure.Core do
 
   def slurp [{:string, file_name} | _] do
     case File.read(file_name) do
-      {:ok, body} -> {:string, body}
+      {:ok, body} -> string(body)
       _ -> raise "No file #{file_name}"
     end
   end
@@ -69,14 +70,13 @@ defmodule Eljure.Core do
     result = args
              |> Enum.map(&value/1)
              |> Enum.reduce(&(&2 ++ &1))
-   {:list, result}
+    list(result)
   end
 
   def str args do
-    {:string,
-     args
-     |> Enum.map(&as_string/1)
-     |> Enum.join("")}
+    string(args
+          |> Enum.map(&as_string/1)
+          |> Enum.join(""))
   end
 
 end

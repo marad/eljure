@@ -14,7 +14,7 @@ defmodule Eljure.Evaluator do
   end
 
   def eval({:list, [{:symbol, "fn"}, {:vector, args} | body]}, scope) do
-    {{:function, &(invoke_fn args, body, scope, &1)}, scope}
+    {function(&(invoke_fn args, body, scope, &1)), scope}
   end
 
   def eval({:list, [{:symbol, "let"}, {:vector, args} | body]}, scope) do
