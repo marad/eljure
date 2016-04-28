@@ -34,4 +34,5 @@ defmodule EljureTest.Core do
   test "vector should return vector from its arguments" do
     assert vector([int(1), int(2)]) == vector_func([ int(1), int(2) ])
   end
+
 end

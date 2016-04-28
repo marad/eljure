@@ -50,6 +50,23 @@ defmodule Eljure.Evaluator do
     end
   end
 
+  def eval({:list, [{:symbol, "apply"}, {:symbol, _} = func_symbol | arg_list]}, scope) do
+    {f, _} = eval(func_symbol, scope)
+    args = arg_list
+           |> Enum.map(&(eval(&1, scope)))
+           |> Enum.map(&(elem(&1, 0)))
+
+    case List.last(args) do
+      {:vector, arg_vec} ->
+        first_args = List.delete_at(args, -1)
+        { apply(f, first_args ++ arg_vec), scope }
+
+      _ ->
+        { apply(f, args), scope }
+    end
+
+  end
+
   def eval {:list, [{:symbol, "."}, {:symbol, func_name} | arg_list]}, scope do
     args = arg_list
            |> Enum.map(&(eval(&1, scope)))

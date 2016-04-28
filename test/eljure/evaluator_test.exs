@@ -7,7 +7,7 @@ defmodule EljureTest.Evaluator do
   alias Eljure.Reader
 
   defp sumFunc args do
-    int( value(Enum.at(args,0)) + value(Enum.at(args,1)) )
+    int( Enum.reduce(Enum.map(args, &value/1), &+/2) )
   end
 
   test "should eval symbol to it's value" do
@@ -143,6 +143,20 @@ defmodule EljureTest.Evaluator do
     scope = Scope.new
     expr = Reader.read "(quote (1 2))"
     assert { list([int(1), int(2)]), scope } == eval(expr, scope)
+  end
+
+  test "'apply' should apply function to arguments" do
+    scope = Scope.new %{
+      "+" => function(&sumFunc/1),
+    }
+
+    #1
+    with_arg_vector = Reader.read "(apply + 1 2 [3 4])"
+    assert { int(10), scope } == eval(with_arg_vector, scope)
+
+    #2
+    without_arg_vector = Reader.read "(apply + 1 2 3)"
+    assert { int(6), scope } == eval(without_arg_vector, scope)
   end
 
   test "calling native elixir functions" do
