@@ -15,6 +15,8 @@ defmodule Eljure.Core do
       "cons" => {:function, &cons/1},
       "concat" => {:function, &concat/1},
       "str" => {:function, &str/1},
+      "list"=> {:function, &list_func/1},
+      "vector"=> {:function, &vector_func/1},
     }
   end
 
@@ -77,6 +79,14 @@ defmodule Eljure.Core do
     string(args
           |> Enum.map(&as_string/1)
           |> Enum.join(""))
+  end
+
+  def list_func args do
+    list(args)
+  end
+
+  def vector_func args do
+    vector(args)
   end
 
 end

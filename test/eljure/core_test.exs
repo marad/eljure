@@ -27,4 +27,11 @@ defmodule EljureTest.Core do
     assert list([int(5), int(6), int(7)]) == concat([ list([int(5)]), list([int(6)]), list([int(7)]) ])
   end
 
+  test "list should return list from its arguments" do
+    assert list([int(1), int(2)]) == list_func([ int(1), int(2) ])
+  end
+
+  test "vector should return vector from its arguments" do
+    assert vector([int(1), int(2)]) == vector_func([ int(1), int(2) ])
+  end
 end
