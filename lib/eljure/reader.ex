@@ -50,7 +50,11 @@ defmodule Eljure.Reader do
   end
 
   defp read_sequence([], _acc, stop) do
-    raise {:error, "Expected #{stop} but got nothing"}
+    #raise Eljure.Error.SyntaxError, message: "Expected '#{stop}' but got nothing"
+
+    # Autocomplete missing parens
+    # Not sure if this is not a bad idea...
+    { Enum.reverse(_acc), [] }
   end
 
   defp read_sequence([head | tail] = tokens, acc, stop) do

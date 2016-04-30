@@ -28,7 +28,7 @@ defmodule Eljure.Main do
           print result
           loop updated_scope
         rescue
-          ex in RuntimeError ->
+          ex ->
             IO.puts ex.message
             loop scope
         end
