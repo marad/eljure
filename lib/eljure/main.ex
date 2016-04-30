@@ -5,22 +5,22 @@ defmodule Eljure.Main do
   alias Eljure.Evaluator
   alias Eljure.Prelude
 
-  def start do
-    case Mix.env do
-      :test -> ;
-      _ ->
-        IO.puts "Starting Eljure REPL..."
-        Core.create_root_scope
-        |> Prelude.init
-        |> loop
-    end
+  def main args do
+    start_repl
+  end
+
+  def start_repl do
+    IO.puts "Starting Eljure REPL..."
+    Core.create_root_scope
+    |> Prelude.init
+    |> loop
   end
 
   defp loop scope do
     case prompt do
       "" -> loop scope
 
-      "quit" ->; # quit loop
+      "quit" -> false # quit loop
 
       data ->
         try do

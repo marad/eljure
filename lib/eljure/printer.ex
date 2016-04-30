@@ -7,7 +7,7 @@ defmodule Eljure.Printer do
   def show({:float, i}), do: to_string(i)
   def show({:string, s}), do: "\"#{s}\""
   def show({:keyword, k}), do: ":#{k}"
-  def show({:function, f}), do: "<function>"
+  def show({:function, _f}), do: "<function>"
   def show({:list, list}) do
     "(#{list |> Enum.map(&show/1)
              |> Enum.join(" ")})"

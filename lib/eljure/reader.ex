@@ -49,12 +49,12 @@ defmodule Eljure.Reader do
           |> Enum.into(%{}, fn [k, v] -> {k, v} end) ), rest }
   end
 
-  defp read_sequence([], _acc, stop) do
+  defp read_sequence([], acc, _stop) do
     #raise Eljure.Error.SyntaxError, message: "Expected '#{stop}' but got nothing"
 
     # Autocomplete missing parens
     # Not sure if this is not a bad idea...
-    { Enum.reverse(_acc), [] }
+    { Enum.reverse(acc), [] }
   end
 
   defp read_sequence([head | tail] = tokens, acc, stop) do
