@@ -5,15 +5,30 @@ defmodule Eljure.Main do
   alias Eljure.Evaluator
   alias Eljure.Prelude
 
-  def main args do
+  def main [] do
     start_repl
   end
 
+  def main [file] do
+    scope = Core.create_root_scope
+            |> Prelude.init
+    Evaluator.eval Reader.read("(load-file \"#{file}\")"), scope
+  end
+
+  def main [file | args] do
+    # TODO: run file with args
+    IO.puts "To many arguments!"
+  end
+
   def start_repl do
-    IO.puts "Starting Eljure REPL..."
     Core.create_root_scope
     |> Prelude.init
     |> loop
+  end
+
+  defp parse_args args do
+    {options, _, _} = OptionParser.parse(args, switches: [])
+    options
   end
 
   defp loop scope do
