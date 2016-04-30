@@ -29,7 +29,7 @@ defmodule Eljure.Main do
           loop updated_scope
         rescue
           ex ->
-            IO.puts ex.message
+            IO.puts Exception.message ex
             loop scope
         end
     end

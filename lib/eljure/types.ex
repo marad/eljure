@@ -3,6 +3,7 @@ defmodule Eljure.Types do
   def value {_, v} do v end
 
   def int(i), do: {:integer, i}
+  def float(f), do: {:float, f}
   def string(s), do: {:string, s}
   def bool(true), do: {:boolean, true}
   def bool(false), do: {:boolean, false}
@@ -18,7 +19,7 @@ defmodule Eljure.Types do
   def native_to_ast(term) when is_atom(term), do: keyword(to_string(term))
   def native_to_ast(term) when is_bitstring(term), do: string(term)
   def native_to_ast(term) when is_integer(term), do: int(term)
-  #def native_to_ast(term) when is_float(term), do: {:float, term}
+  def native_to_ast(term) when is_float(term), do: float(term)
 
   def native_to_ast(term) when is_map(term) do
     converted_map = Enum.reduce(term, %{}, fn {k,v}, acc ->

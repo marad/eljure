@@ -4,6 +4,7 @@ defmodule Eljure.Printer do
   def show({:boolean, false}), do: "false"
   def show({:symbol, s}), do: to_string(s)
   def show({:integer, i}), do: to_string(i)
+  def show({:float, i}), do: to_string(i)
   def show({:string, s}), do: "\"#{s}\""
   def show({:keyword, k}), do: ":#{k}"
   def show({:function, f}), do: "<function>"

@@ -39,14 +39,14 @@ defmodule Eljure.Evaluator do
           {nil, _} -> eval(false_form, scope)
           _ -> eval(true_form, scope)
         end
-      _ -> raise Eljure.Error.EvalError, "Invalid 'if' expression: #{show form}."
+      _ -> raise Eljure.Error.EvalError, "Invalid expression: #{show form}."
     end
   end
 
   def eval({:list, [{:symbol, "quote"} | args]} = whole, scope) do
     case args do
       [form] -> {form, scope}
-      _ -> raise Eljure.Error.EvalError, "Expected exactly one argument in #{show whole}."
+      _ -> raise Eljure.Error.ArityError, "Expected exactly one argument in #{show whole}."
     end
   end
 

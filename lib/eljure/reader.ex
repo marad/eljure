@@ -85,6 +85,9 @@ defmodule Eljure.Reader do
       is_integer?(token) ->
         int(Integer.parse(token) |> elem(0))
 
+      is_float?(token) ->
+        float(Float.parse(token) |> elem(0))
+
       true ->
         symbol(token)
     end
@@ -92,6 +95,10 @@ defmodule Eljure.Reader do
   
   defp is_integer?(input) do
     Regex.match?(~r/^-?[0-9]+$/, input)
+  end
+
+  defp is_float?(input) do
+    Regex.match?(~r/^-?[0-9]+\.[0-9]+$/, input)
   end
 
 end
