@@ -104,8 +104,19 @@ defmodule Eljure.Evaluator do
     {Scope.get(scope, symbol), scope}
   end
 
-  def eval_ast({:list, list}, scope) do
-    {Enum.map(list, &(elem(eval(&1, scope), 0))), scope}
+  def eval_ast({:list, l}, scope) do
+    { Enum.map(l, &(elem(eval(&1, scope), 0))), scope}
+  end
+
+  def eval_ast({:vector, v}, scope) do
+    { vector(Enum.map(v, &(elem(eval(&1, scope), 0)))), scope}
+  end
+
+  def eval_ast({:map, m}, scope) do
+    evaled = Enum.reduce(m, %{}, fn {k, v}, r ->
+      Map.put(r, k, elem(eval(v,scope), 0))
+    end)
+    { map(evaled), scope }
   end
 
   def eval_ast(ast, scope) do

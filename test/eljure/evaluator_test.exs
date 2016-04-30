@@ -50,6 +50,22 @@ defmodule EljureTest.Evaluator do
    assert {int(3), scope} == eval expr, scope
   end
 
+  test "should evaluate vector tokens" do
+    scope = Scope.new %{
+      "a" => int(3)
+    }
+    expr = Reader.read "[1 2 a]"
+    assert {vector([int(1), int(2), int(3)]), scope} == eval expr, scope
+  end
+
+  test "should evaluate map tokens" do
+    scope = Scope.new %{
+      "a" => int(3)
+    }
+    expr = Reader.read "{:a a}"
+    assert {map(%{keyword("a") => int(3)}), scope} == eval expr, scope
+  end
+
   test "'def' should define variables" do
     scope = Scope.new
     expr = Reader.read "(def sym 5)"
