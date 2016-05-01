@@ -161,6 +161,21 @@ defmodule EljureTest.Evaluator do
     assert { list([int(1), int(2)]), scope } == eval(expr, scope)
   end
 
+  test "'quasiquote' should return unevaluated first form" do
+    scope = Eljure.Core.create_root_scope
+    assert { list([int(1)]), scope } == eval(Reader.read("(quasiquote (1))"), scope)
+    assert {int(2), scope } == eval(Reader.read("(quasiquote (unquote (+ 1 1)))"), scope)
+  end
+
+  test "complex quasiquote expression" do
+    scope = Eljure.Core.create_root_scope
+            |> Scope.put("a", int(2))
+            |> Scope.put("b", vector([3, 4]))
+    expr = Reader.read "(quasiquote (1 (unquote a) (splice-unquote b)))"
+    expected = Reader.read "(1 2 3 4)"
+    assert expected = eval expr, scope
+  end
+
   test "'apply' should apply function to arguments" do
     scope = Scope.new %{
       "+" => function(&sumFunc/1),

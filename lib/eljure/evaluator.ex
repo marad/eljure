@@ -50,6 +50,14 @@ defmodule Eljure.Evaluator do
     end
   end
 
+  def eval({:list, [{:symbol, "quasiquote"} | args]} = whole, scope) do
+    case args do
+      [form] -> eval Eljure.Quasiquote.quasiquote(form), scope
+      #[form] -> { Eljure.Quasiquote.quasiquote(form), scope }
+      _ -> raise Eljure.Error.ArityError, "Expected exactly one argument in #{show whole}."
+    end
+  end
+
   def eval({:list, [{:symbol, "apply"}, {:symbol, _} = func_symbol | arg_list]}, scope) do
     {f, _} = eval(func_symbol, scope)
     args = arg_list
@@ -83,7 +91,7 @@ defmodule Eljure.Evaluator do
 
   def eval({:list, [{:symbol, "eval"} | args]}, scope) do
     case args do
-      [ast] -> 
+      [ast] ->
         {evaled_ast, _} = eval(ast, scope)
         eval(evaled_ast, scope)
       _ -> "Arity exception! Expected one argument."
