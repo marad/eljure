@@ -150,4 +150,8 @@ defmodule Eljure.Evaluator do
   def apply {:function, f}, args do
     Kernel.apply(f, [args])
   end
+
+  def apply what, _ do
+    raise Eljure.Error.EvalError, "#{show what} is not a function"
+  end
 end
