@@ -170,10 +170,12 @@ defmodule EljureTest.Evaluator do
   test "complex quasiquote expression" do
     scope = Eljure.Core.create_root_scope
             |> Scope.put("a", int(2))
-            |> Scope.put("b", vector([3, 4]))
+            |> Scope.put("b", vector([int(3), int(4)]))
     expr = Reader.read "(quasiquote (1 (unquote a) (splice-unquote b)))"
+    expr2 = Reader.read "`(1 ~a ~@b)"
     expected = Reader.read "(1 2 3 4)"
-    assert expected = eval expr, scope
+    assert {expected, scope} == eval expr, scope
+    assert {expected, scope} == eval expr2, scope
   end
 
   test "'apply' should apply function to arguments" do

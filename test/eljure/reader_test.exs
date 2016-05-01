@@ -39,4 +39,16 @@ defmodule EljureTest.Reader do
     assert list([symbol("quote"), symbol("a")]) == read("'a")
   end
 
+  test "should read '`' as quasiquote" do
+    assert read("(quasiquote a)") == read("`a")
+  end
+
+  test "should read '~'  as unquote" do
+    assert read("(unquote a)") == read("~a")
+  end
+
+  test "should read '~@' as splice-unquote" do
+    assert read("(splice-unquote (1 2 3)") == read("~@(1 2 3)")
+  end
+
 end

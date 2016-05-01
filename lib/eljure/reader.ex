@@ -25,7 +25,10 @@ defmodule Eljure.Reader do
       "(" -> read_list(tokens)
       "[" -> read_vector(tokens)
       "{" -> read_map(tokens)
-      "'" -> read_quote(tokens)
+      "'" -> read_quote("quote", tokens)
+      "`" -> read_quote("quasiquote", tokens)
+      "~" -> read_quote("unquote", tokens)
+      "~@" -> read_quote("splice-unquote", tokens)
       _ -> 
         { read_atom(next), rest }
     end
@@ -66,9 +69,9 @@ defmodule Eljure.Reader do
     end
   end
 
-  defp read_quote([_ | tokens]) do
+  defp read_quote(name, [_ | tokens]) do
     { form, rest } = read_form(tokens)
-    { list([{:symbol, "quote"}, form]), rest }
+    { list([{:symbol, name}, form]), rest }
   end
 
   defp read_atom("nil"), do: nil
