@@ -20,6 +20,10 @@ defmodule Eljure.Quasiquote do
     true
   end
 
+  def is_pair? {:vector, [_head | _args]} do
+    true
+  end
+
   def is_pair? _ do
     false
   end
