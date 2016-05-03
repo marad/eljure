@@ -217,12 +217,10 @@ defmodule EljureTest.Evaluator do
 
   test "expanding macro" do
     # given
-    scope = Scope.new %{
-      "x" => int(7)
-    }
-    macro_expr = Reader.read "(defmacro test [name] `(defn ~name [x] x))"
+    scope = Eljure.Core.create_root_scope
+    macro_expr = Reader.read "(defmacro test [name] `(def ~name (fn [x] x)))"
     expand_expr = Reader.read "(macroexpand-1 '(test identity))"
-    expected_result = Reader.read "(defn identity [x] x)"
+    expected_result = Reader.read "(def identity (fn [x] x))"
 
     # when
     eval macro_expr, scope
@@ -231,6 +229,22 @@ defmodule EljureTest.Evaluator do
     # then
     assert scope == updated_scope
     assert expected_result == result
+  end
+
+  test "running a macro" do
+    # given
+    scope = Eljure.Core.create_root_scope
+    macro_expr = Reader.read "(defmacro test [name] `(def ~name (fn [x] x)))"
+    test_expr = Reader.read "(do (test id-test) (id-test 5))"
+
+    # when
+    eval macro_expr, scope
+    {result, updated_scope} = eval test_expr, scope
+
+    # then
+    assert scope == updated_scope
+    assert int(5) == result
+
   end
 
 end

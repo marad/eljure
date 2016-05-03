@@ -80,9 +80,15 @@ defmodule Eljure.Evaluator do
     {m, Scope.put(scope, name, m)}
   end
 
-  #def eval {:list, [{:symbol, "macroexpand-1"}, form]}, scope do
-  #  eval form, scope
-  #end
+  def eval {:list, [{:symbol, "macroexpand-1"}, {:list, [{:symbol, "quote"}, form]}]}, scope do
+    { first, _ } = eval List.first(value(form)), scope
+    case type(first) do
+      :macro ->
+        macro_args = List.delete_at(value(form), 0)
+        { apply(first, macro_args), scope }
+      _ -> eval form, scope
+    end
+  end
 
   def eval {:list, [{:symbol, "."}, {:symbol, func_name} | arg_list]}, scope do
     args = arg_list
@@ -120,7 +126,8 @@ defmodule Eljure.Evaluator do
 
       :macro ->
         macro_args = List.delete_at(ast, 0)
-        { apply(f, macro_args), scope }
+        expr = apply(f, macro_args)
+        eval(expr, scope)
     end
   end
 
