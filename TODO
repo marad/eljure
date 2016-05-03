@@ -4,5 +4,8 @@ Project:
 
 Language:
 - function argument destructuring
+- defrecord
+- defmulti
+- protocols
 - varargs (&)
 - stdlib
