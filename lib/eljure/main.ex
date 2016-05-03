@@ -43,7 +43,8 @@ defmodule Eljure.Main do
           print result
           loop updated_scope
         rescue
-          ex ->
+          ex in ArityError ->
+            # TODO: print stacktrace
             IO.puts Exception.message ex
             loop scope
         end

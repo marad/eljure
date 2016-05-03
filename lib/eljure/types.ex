@@ -13,6 +13,7 @@ defmodule Eljure.Types do
   def list(l), do: {:list, l}
   def vector(v), do: {:vector, v}
   def map(m), do: {:map, m}
+  def macro(m), do: {:macro, m}
 
   def native_to_ast(term) when is_nil(term), do: nil
   def native_to_ast(term) when is_boolean(term), do: bool(term)

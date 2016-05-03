@@ -75,6 +75,15 @@ defmodule Eljure.Evaluator do
 
   end
 
+  def eval {:list, [{:symbol, "defmacro"}, {:symbol, name}, {:vector, args} | body]}, scope do
+    m = macro(&(invoke_fn args, body, scope, &1))
+    {m, Scope.put(scope, name, m)}
+  end
+
+  #def eval {:list, [{:symbol, "macroexpand-1"}, form]}, scope do
+  #  eval form, scope
+  #end
+
   def eval {:list, [{:symbol, "."}, {:symbol, func_name} | arg_list]}, scope do
     args = arg_list
            |> Enum.map(&(eval(&1, scope)))
@@ -98,9 +107,27 @@ defmodule Eljure.Evaluator do
     end
   end
 
-  def eval({:list, _} = ast, scope) do
-    {[f | args], _} = eval_ast(ast, scope)
-    { apply(f, args), scope }
+  #def eval({:list, [{:symbol, macro_name} | args]}, scope) do
+  #  macro = 
+  #end
+
+  def eval({:list, ast}, scope) do
+    #{[f | args], _} = eval_ast(ast, scope)
+    fname = List.first(ast)
+    args_ast = List.delete_at(ast, 0)
+
+    {f, _} = eval_ast(fname, scope)
+
+    case type(f) do 
+      :function ->
+        args = eval_ast({:list, args_ast}, scope)
+        { apply(f, args), scope }
+
+      :macro ->
+        macro_args = List.delete_at(ast, 0)
+        IO.puts Eljure.Printer.show {:list, macro_args}
+        { apply(f, macro_args), scope }
+    end
   end
 
 
@@ -143,8 +170,11 @@ defmodule Eljure.Evaluator do
       fn {{:symbol, sym}, arg}, acc ->
         Scope.put(acc, sym, arg)
       end)
-
     elem(List.last(body |> Enum.map(&(eval &1, func_scope))), 0)
+  end
+
+  def apply {:macro, f}, args do
+    Kernel.apply(f, [args])
   end
 
   def apply {:function, f}, args do

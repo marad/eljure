@@ -205,4 +205,32 @@ defmodule EljureTest.Evaluator do
     assert string("erujle") == result
   end
 
+  test "defining macro" do
+    scope = Scope.new
+    expr = Reader.read "(defmacro test [a b] `(a ~b))"
+
+    {result, updated_scope} = eval expr, scope
+
+    assert scope == updated_scope
+    assert :macro == type(result)
+  end
+
+  test "expanding macro" do
+    # given
+    scope = Scope.new %{
+      "x" => int(7)
+    }
+    macro_expr = Reader.read "(defmacro test [a b] `(+ a ~b))"
+    expand_expr = Reader.read "(macroexpand-1 '(test sym x))"
+    expected_result = list([symbol("test"), symbol("sym"), int(7)]) 
+
+    # when
+    eval macro_expr, scope
+    {result, updated_scope} = eval expand_expr, scope
+
+    # then
+    assert scope == updated_scope
+    assert expected_result == result
+  end
+
 end
