@@ -6,7 +6,7 @@ defmodule Eljure.Quasiquote do
       true ->
         case ast do
           {:list, [{:symbol, "unquote"}, ast | _]} -> ast
-          {:list, [{:list, [{:symbol, "splice-unquote"}, to_unquote]} | tail]} -> 
+          {:list, [{:list, [{:symbol, "splice-unquote"}, to_unquote]} | tail]} ->
             list([symbol("concat"), to_unquote, quasiquote(list(tail))])
           {:list, [head | tail]} ->
             list([symbol("cons"), quasiquote(head), quasiquote(list(tail))])

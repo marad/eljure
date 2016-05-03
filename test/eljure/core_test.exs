@@ -19,6 +19,13 @@ defmodule EljureTest.Core do
     assert vector [int(5)] == cons [int(5), vector([])]
   end
 
+  test "cons adding vector" do
+    v = vector([])
+    assert list([v, 1]) == cons [v, list([1])]
+    assert vector([v, 1]) == cons [v, vector([1])]
+    #assert true == false
+  end
+
   test "concat should concatenate lists" do
     assert list([]) == concat([ list([]), list([]) ])
     assert list([int(5)]) == concat([ list([int(5)]), list([]) ])

@@ -120,7 +120,7 @@ defmodule Eljure.Evaluator do
 
     case type(f) do 
       :function ->
-        args = eval_ast({:list, args_ast}, scope)
+        { args, _ } = eval_ast({:list, args_ast}, scope)
         { apply(f, args), scope }
 
       :macro ->
