@@ -1,6 +1,6 @@
 # Eljure
 
-**TODO: Add description**
+Eljure is general purpose Clojure-like programming language for Erlang's virtual machine.
 
 ## Installation
 
