@@ -220,9 +220,9 @@ defmodule EljureTest.Evaluator do
     scope = Scope.new %{
       "x" => int(7)
     }
-    macro_expr = Reader.read "(defmacro test [a b] `(+ a ~b))"
-    expand_expr = Reader.read "(macroexpand-1 '(test sym x))"
-    expected_result = list([symbol("test"), symbol("sym"), int(7)]) 
+    macro_expr = Reader.read "(defmacro test [name] `(defn ~name [x] x))"
+    expand_expr = Reader.read "(macroexpand-1 '(test identity))"
+    expected_result = Reader.read "(defn identity [x] x)"
 
     # when
     eval macro_expr, scope

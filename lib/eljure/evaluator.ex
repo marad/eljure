@@ -107,25 +107,19 @@ defmodule Eljure.Evaluator do
     end
   end
 
-  #def eval({:list, [{:symbol, macro_name} | args]}, scope) do
-  #  macro = 
-  #end
-
   def eval({:list, ast}, scope) do
-    #{[f | args], _} = eval_ast(ast, scope)
     fname = List.first(ast)
     args_ast = List.delete_at(ast, 0)
 
-    {f, _} = eval_ast(fname, scope)
+    {f, _} = eval(fname, scope)
 
     case type(f) do 
       :function ->
-        { args, _ } = eval_ast({:list, args_ast}, scope)
+        { args, _ } = eval_ast(list(args_ast), scope)
         { apply(f, args), scope }
 
       :macro ->
         macro_args = List.delete_at(ast, 0)
-        IO.puts Eljure.Printer.show {:list, macro_args}
         { apply(f, macro_args), scope }
     end
   end
