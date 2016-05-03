@@ -1,0 +1,8 @@
+Project:
+- refactor, refactor, refactor!
+- maybe use defmacro to cleanup the "eval" definitions?
+
+Language:
+- function argument destructuring
+- varargs (&)
+- stdlib
