@@ -5,6 +5,7 @@ defmodule Eljure.Prelude do
   def init(scope) do
     read_eval(not_func, scope)
     read_eval(load_file, scope)
+    read_eval(when_not, scope)
 
     scope
   end
@@ -22,6 +23,13 @@ defmodule Eljure.Prelude do
     (def load-file
       (fn [file-name]
         (eval (read-string (str "(do " (slurp file-name) ")")))))
+    """
+  end
+
+  def when_not do
+    """
+    (defmacro when-not [cond expr]
+      `(if (not ~cond) ~expr nil))
     """
   end
 
