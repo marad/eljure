@@ -15,7 +15,7 @@ defmodule Eljure.Main do
     Evaluator.eval Reader.read("(load-file \"#{file}\")"), scope
   end
 
-  def main [file | args] do
+  def main [_file | _args] do
     # TODO: run file with args
     IO.puts "To many arguments!"
   end
@@ -24,11 +24,6 @@ defmodule Eljure.Main do
     Core.create_root_scope
     |> Prelude.init
     |> loop
-  end
-
-  defp parse_args args do
-    {options, _, _} = OptionParser.parse(args, switches: [])
-    options
   end
 
   defp loop scope do
@@ -43,7 +38,7 @@ defmodule Eljure.Main do
           print result
           loop updated_scope
         rescue
-          ex in ArityError ->
+          ex ->
             # TODO: print stacktrace
             IO.puts Exception.message ex
             loop scope

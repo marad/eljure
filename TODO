@@ -7,5 +7,4 @@ Language:
 - defrecord
 - defmulti
 - protocols
-- varargs (&)
 - stdlib

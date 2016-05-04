@@ -29,7 +29,7 @@ defmodule EljureTest.Types do
 
   test "converting function to eljure function" do
     inc = native_to_ast(fn x -> x + 1 end)
-    assert int(6) == Eljure.Evaluator.apply(inc, [int(5)])
+    assert int(6) == Eljure.Function.apply(inc, [int(5)])
   end
 
 end
