@@ -100,6 +100,16 @@ defmodule EljureTest.Evaluator do
     assert int(5) == result
   end
 
+  test "'&' in fn argument list" do
+    scope = Scope.new
+    expr = Reader.read "((fn [a & b] [a b]) 1 2 3 4)"
+
+    {result, updated_scope} = eval expr, scope
+
+    assert scope == updated_scope
+    assert vector([int(1), list([int(2), int(3), int(4)])]) == result
+  end
+
   test "'let' should create it's scope" do
     # given
     scope = Scope.put(Scope.new, "+", function(&sumFunc/1))

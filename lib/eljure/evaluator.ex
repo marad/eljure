@@ -164,14 +164,35 @@ defmodule Eljure.Evaluator do
     native_to_ast(result)
   end
 
-  defp invoke_fn argvec, body, scope, args do
+  defp invoke_fn arg_names, body, scope, arg_values do
     func_scope = List.foldl(
-      Enum.zip(argvec, args),
+      prepare_arg_bindings(arg_names, arg_values),
       Scope.child(scope),
-      fn {{:symbol, sym, _}, arg}, acc ->
-        Scope.put(acc, sym, arg)
+      fn {{:symbol, arg_name, _}, arg_value}, acc ->
+        Scope.put(acc, arg_name, arg_value)
       end)
+
     elem(List.last(body |> Enum.map(&(eval &1, func_scope))), 0)
+  end
+
+  defp prepare_arg_bindings([{:symbol, "&", _}, arg_name], values) do
+    [ { arg_name, list(values) } ]
+  end
+
+  defp prepare_arg_bindings([arg_name | names], [arg_value | values]) do
+    [ { arg_name, arg_value } | prepare_arg_bindings(names, values) ]
+  end
+
+  defp prepare_arg_bindings([], []) do
+    []
+  end
+
+  defp prepare_arg_bindings([], _values) do
+    raise Eljure.Error.ArityError
+  end
+
+  defp prepare_arg_bindings(_names, []) do
+    raise Eljure.Error.ArityError
   end
 
   def apply {:macro, f, _}, args do
