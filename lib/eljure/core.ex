@@ -17,6 +17,8 @@ defmodule Eljure.Core do
       "str" => function(&str/1),
       "list"=> function(&list_func/1),
       "vector"=> function(&vector_func/1),
+      "with-meta"=> function(&with_meta/1),
+      "meta"=> function(&get_meta/1),
     }
   end
 
@@ -89,4 +91,17 @@ defmodule Eljure.Core do
     vector(args)
   end
 
+  def with_meta args do
+    case args do
+      [{t, v, _}, m] -> {t, v, m}
+      _ -> raise Eljure.Error.ArityError
+    end
+  end
+
+  def get_meta args do
+    case args do
+      [{_, _, m}] -> m
+      _ -> raise Eljure.Error.ArityError
+    end
+  end
 end

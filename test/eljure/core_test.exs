@@ -42,4 +42,14 @@ defmodule EljureTest.Core do
     assert vector([int(1), int(2)]) == vector_func([ int(1), int(2) ])
   end
 
+  test "with-meta overrides metadata" do
+    assert int(1, %{foo: "bar"}) == with_meta [int(1, %{old: "meta"}), %{foo: "bar"}]
+  end
+
+  test "meta returns metadata" do
+    m = string("hello")
+    v = with_meta [int(1), m]
+
+    assert m == get_meta [v]
+  end
 end
