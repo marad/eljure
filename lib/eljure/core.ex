@@ -5,18 +5,18 @@ defmodule Eljure.Core do
 
   def create_root_scope do
     Scope.new %{
-      "+"=> {:function, &plus/1},
-      "-"=> {:function, &minus/1},
-      "*"=> {:function, &mult/1},
-      "/"=> {:function, &divide/1},
-      "read-string" => {:function, &read_string/1},
-      "slurp" => {:function, &slurp/1},
-      "println" => {:function, &println/1},
-      "cons" => {:function, &cons/1},
-      "concat" => {:function, &concat/1},
-      "str" => {:function, &str/1},
-      "list"=> {:function, &list_func/1},
-      "vector"=> {:function, &vector_func/1},
+      "+"=> function(&plus/1),
+      "-"=> function(&minus/1),
+      "*"=> function(&mult/1),
+      "/"=> function(&divide/1),
+      "read-string" => function(&read_string/1),
+      "slurp" => function(&slurp/1),
+      "println" => function(&println/1),
+      "cons" => function(&cons/1),
+      "concat" => function(&concat/1),
+      "str" => function(&str/1),
+      "list"=> function(&list_func/1),
+      "vector"=> function(&vector_func/1),
     }
   end
 
@@ -45,7 +45,7 @@ defmodule Eljure.Core do
     Eljure.Reader.read(value(str_expr))
   end
 
-  def slurp [{:string, file_name} | _] do
+  def slurp [{:string, file_name, _} | _] do
     case File.read(file_name) do
       {:ok, body} -> string(body)
       _ -> raise "No file #{file_name}"
@@ -62,8 +62,8 @@ defmodule Eljure.Core do
 
   def cons args do
     case args do
-      [value, {type, []}] -> {type, [value]}
-      [value, {type, [_ | _] = list}] -> {type, [value | list]}
+      [value, {type, [], meta}] -> {type, [value], meta}
+      [value, {type, [_ | _] = list, meta}] -> {type, [value | list], meta}
       _ -> raise "Invalid arguments! Expected value and a list."
     end
   end

@@ -1,19 +1,19 @@
 defmodule Eljure.Types do
-  def type {t, _} do t end
-  def value {_, v} do v end
+  def type {t, _, _} do t end
+  def value {_, v, _} do v end
+  def meta {_, _, m} do m end
 
-  def int(i), do: {:integer, i}
-  def float(f), do: {:float, f}
-  def string(s), do: {:string, s}
-  def bool(true), do: {:boolean, true}
-  def bool(false), do: {:boolean, false}
-  def keyword(kw), do: {:keyword, kw}
-  def symbol(s), do: {:symbol, s}
-  def function(f), do: {:function, f}
-  def list(l), do: {:list, l}
-  def vector(v), do: {:vector, v}
-  def map(m), do: {:map, m}
-  def macro(m), do: {:macro, m}
+  def int(i, meta \\ nil), do: {:integer, i, meta}
+  def float(f, meta \\ nil), do: {:float, f, meta}
+  def string(s, meta \\ nil), do: {:string, s, meta}
+  def bool(b, meta \\ nil), do: {:boolean, b, meta}
+  def keyword(kw, meta \\ nil), do: {:keyword, kw, meta}
+  def symbol(s, meta \\ nil), do: {:symbol, s, meta}
+  def function(f, meta \\ nil), do: {:function, f, meta}
+  def list(l, meta \\ nil), do: {:list, l, meta}
+  def vector(v, meta \\ nil), do: {:vector, v, meta}
+  def map(m, meta \\ nil), do: {:map, m, meta}
+  def macro(m, meta \\ nil), do: {:macro, m, meta}
 
   def native_to_ast(term) when is_nil(term), do: nil
   def native_to_ast(term) when is_boolean(term), do: bool(term)

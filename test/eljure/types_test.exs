@@ -4,15 +4,15 @@ defmodule EljureTest.Types do
   import Eljure.Types
 
   test "creating types" do
-    assert {:integer, 5} == int(5)
-    assert {:integer, 6} == int(6)
-    assert {:string, "hello"} == string("hello")
-    assert {:keyword, "kw"} == keyword("kw")
-    assert {:symbol, "s"} == symbol("s")
-    assert {:function, &+/2} == function(&+/2)
-    assert {:list, [{:integer, 5}]} == list [int(5)]
-    assert {:vector, [{:integer, 5}]} == vector [int(5)]
-    assert {:map, %{a: 1}} == map %{a: 1}
+    assert {:integer, 5, nil} == int(5)
+    assert {:integer, 6, nil} == int(6)
+    assert {:string, "hello", nil} == string("hello")
+    assert {:keyword, "kw", nil} == keyword("kw")
+    assert {:symbol, "s", nil} == symbol("s")
+    assert {:function, &+/2, nil} == function(&+/2)
+    assert {:list, [{:integer, 5, nil}], nil} == list [int(5)]
+    assert {:vector, [{:integer, 5, nil}], nil} == vector [int(5)]
+    assert {:map, %{a: 1}, nil} == map %{a: 1}
   end
 
   test "converting native map to eljure map" do

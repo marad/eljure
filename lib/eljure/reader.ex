@@ -71,7 +71,7 @@ defmodule Eljure.Reader do
 
   defp read_quote(name, [_ | tokens]) do
     { form, rest } = read_form(tokens)
-    { list([{:symbol, name}, form]), rest }
+    { list([symbol(name), form]), rest }
   end
 
   defp read_atom("nil"), do: nil
