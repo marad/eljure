@@ -39,8 +39,8 @@ defmodule Eljure.Main do
           loop updated_scope
         rescue
           ex ->
-            # TODO: print stacktrace
             IO.puts Exception.message ex
+            IO.puts Exception.format_stacktrace System.stacktrace
             loop scope
         end
     end
