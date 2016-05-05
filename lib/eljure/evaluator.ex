@@ -22,9 +22,6 @@ defmodule Eljure.Evaluator do
     let_scope = Enum.chunk(args, 2)
               |> destructure
               |> bind_params(Scope.child(scope), true)
-    #let_scope = Enum.reduce(Enum.chunk(args, 2), Scope.child(scope), fn [symbol(sym), val], sc ->
-    #  Scope.put(sc, sym, elem(eval(val, sc), 0))
-    #end)
     result = elem(List.last(body |> Enum.map(&(eval &1, let_scope))), 0)
     {result, scope}
   end

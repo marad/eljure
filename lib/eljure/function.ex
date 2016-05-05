@@ -14,7 +14,6 @@ defmodule Eljure.Function do
 
   def prepare_arg_bindings arg_names, arg_values do
     case { arg_names, arg_values } do
-      # TODO: move this to destructuring code
       { [symbol("&"), arg_name], values } ->
         [ [ arg_name, list(values) ] ]
 
@@ -28,7 +27,9 @@ defmodule Eljure.Function do
   end
 
   def destructure bindings do
-    bindings
+    case bindings do
+      _ -> bindings
+    end
   end
 
   def bind_params bindings, scope, eval_values \\ false do
