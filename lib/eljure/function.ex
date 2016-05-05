@@ -44,8 +44,19 @@ defmodule Eljure.Function do
         destructured_bindings = destructure(prepare_arg_bindings(names, values, false))
         destructure(acc ++ destructured_bindings, rest)
 
+      [ [map(name_map), map(value_map)] | rest ] ->
+        {names, values} = extract_map_bindings(name_map, value_map)
+        destructured_bindings = destructure(prepare_arg_bindings(names, values, false))
+        destructure(acc ++ destructured_bindings, rest)
+
       _ -> acc ++ bindings
     end
+  end
+
+  defp extract_map_bindings name_map, value_map do
+    name_list = Enum.map(name_map, fn {name, _} -> name end)
+    value_list = Enum.map(name_map, fn {_, key} -> Map.get(value_map, key) end)
+    { name_list, value_list }
   end
 
   def bind_params bindings, scope, eval_values \\ false do

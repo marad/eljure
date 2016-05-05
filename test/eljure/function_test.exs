@@ -61,6 +61,17 @@ defmodule EljureTest.Function do
              [symbol("b"), vector([int(2), int(3)])] ] == result
   end
 
+  test "destructuring {a :x b :y}" do
+    name = Reader.read "{a :x b :y}"
+    value = Reader.read "{:x 1 :y 2}"
+    bindings = [ [name, value] ]
+
+    result = destructure bindings
+
+    assert [ [symbol("a"), int(1)],
+             [symbol("b"), int(2)] ] == result
+  end
+
   test "binding params" do
     scope = Scope.new
     bindings = [ [ symbol("i"), int(3) ],
