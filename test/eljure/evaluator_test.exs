@@ -110,7 +110,7 @@ defmodule EljureTest.Evaluator do
     assert vector([int(1), list([int(2), int(3), int(4)])]) == result
   end
 
-  test "'let' should create it's scope" do
+  test "'let' should create it's scope and bind arguments sequentially" do
     # given
     scope = Scope.put(Scope.new, "+", function(&sumFunc/1))
     expr = Reader.read "(let [a 5 b (+ a 1)] b)"
