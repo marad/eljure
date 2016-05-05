@@ -47,7 +47,7 @@ defmodule Eljure.Core do
     Eljure.Reader.read(value(str_expr))
   end
 
-  def slurp [{:string, file_name, _} | _] do
+  def slurp [string(file_name) | _] do
     case File.read(file_name) do
       {:ok, body} -> string(body)
       _ -> raise "No file #{file_name}"

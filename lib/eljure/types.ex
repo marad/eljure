@@ -3,17 +3,71 @@ defmodule Eljure.Types do
   def value {_, v, _} do v end
   def meta {_, _, m} do m end
 
-  def int(i, meta \\ nil), do: {:integer, i, meta}
-  def float(f, meta \\ nil), do: {:float, f, meta}
-  def string(s, meta \\ nil), do: {:string, s, meta}
-  def bool(b, meta \\ nil), do: {:boolean, b, meta}
-  def keyword(kw, meta \\ nil), do: {:keyword, kw, meta}
-  def symbol(s, meta \\ nil), do: {:symbol, s, meta}
-  def function(f, meta \\ nil), do: {:function, f, meta}
-  def list(l, meta \\ nil), do: {:list, l, meta}
-  def vector(v, meta \\ nil), do: {:vector, v, meta}
-  def map(m, meta \\ nil), do: {:map, m, meta}
-  def macro(m, meta \\ nil), do: {:macro, m, meta}
+  defmacro int(i, meta \\ nil) do
+    quote do
+      {:integer, unquote(i), unquote(meta)}
+    end
+  end
+
+  defmacro float(f, meta \\ nil) do
+    quote do
+      {:float, unquote(f), unquote(meta)}
+    end
+  end
+
+  defmacro string(s, meta \\ nil) do
+    quote do
+      {:string, unquote(s), unquote(meta)}
+    end
+  end
+
+  defmacro bool(b, meta \\ nil) do
+    quote do
+      {:boolean, unquote(b), unquote(meta)}
+    end
+  end
+
+  defmacro keyword(kw, meta \\ nil) do
+    quote do
+      {:keyword, unquote(kw), unquote(meta)}
+    end
+  end
+
+  defmacro symbol(s, meta \\ nil) do
+    quote do
+      {:symbol, unquote(s), unquote(meta)}
+    end
+  end
+
+  defmacro function(f, meta \\ nil) do
+    quote do
+      {:function, unquote(f), unquote(meta)}
+    end
+  end
+
+  defmacro list(f, meta \\ nil) do
+    quote do
+      {:list, unquote(f), unquote(meta)}
+    end
+  end
+
+  defmacro vector(v, meta \\ nil) do
+    quote do
+      {:vector, unquote(v), unquote(meta)}
+    end
+  end
+
+  defmacro map(m, meta \\ nil) do
+    quote do
+      {:map, unquote(m), unquote(meta)}
+    end
+  end
+
+  defmacro macro(m, meta \\ nil) do
+    quote do
+      {:macro, unquote(m), unquote(meta)}
+    end
+  end
 
   def native_to_ast(term) when is_nil(term), do: nil
   def native_to_ast(term) when is_boolean(term), do: bool(term)

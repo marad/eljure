@@ -1,23 +1,25 @@
 defmodule Eljure.Printer do
+  import Eljure.Types
+
   def show(nil), do: "nil"
-  def show({:boolean, true, _}), do: "true"
-  def show({:boolean, false, _}), do: "false"
-  def show({:symbol, s, _}), do: to_string(s)
-  def show({:integer, i, _}), do: to_string(i)
-  def show({:float, i, _}), do: to_string(i)
-  def show({:string, s, _}), do: "\"#{s}\""
-  def show({:keyword, k, _}), do: ":#{k}"
-  def show({:function, _f, _}), do: "<function>"
-  def show({:macro, _m, _}), do: "<macro>"
-  def show({:list, list, _}) do
+  def show(bool(true)), do: "true"
+  def show(bool(false)), do: "false"
+  def show(symbol(s)), do: to_string(s)
+  def show(int(i)), do: to_string(i)
+  def show(float(f)), do: to_string(f)
+  def show(string(s)), do: "\"#{s}\""
+  def show(keyword(k)), do: ":#{k}"
+  def show(function(_f)), do: "<function>"
+  def show(macro(_m)), do: "<macro>"
+  def show(list(list)) do
     "(#{list |> Enum.map(&show/1)
              |> Enum.join(" ")})"
   end
-  def show({:vector, vector, _}) do
+  def show(vector(vector)) do
     "[#{vector |> Enum.map(&show/1)
                |> Enum.join(" ")}]"
   end
-  def show({:map, map, _}) do
+  def show(map(map)) do
     "{#{map |> Enum.flat_map(fn {k, v} -> [show(k), show(v)] end)
         |> Enum.join(" ")}}"
   end
@@ -25,7 +27,7 @@ defmodule Eljure.Printer do
     to_string(x) <> " !!not atom!!"
   end
 
-  def as_string {:string, s, _} do
+  def as_string string(s) do
     s
   end
 
