@@ -129,6 +129,8 @@ defmodule Eljure.Evaluator do
         macro_args = List.delete_at(ast, 0)
         expr = apply(f, macro_args)
         eval(expr, scope)
+
+      _ -> raise Eljure.Error.EvalError, "#{show f} is not a function"
     end
   end
 

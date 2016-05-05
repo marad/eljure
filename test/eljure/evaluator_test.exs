@@ -107,7 +107,7 @@ defmodule EljureTest.Evaluator do
     {result, updated_scope} = eval expr, scope
 
     assert scope == updated_scope
-    assert vector([int(1), list([int(2), int(3), int(4)])]) == result
+    assert vector([int(1), vector([int(2), int(3), int(4)])]) == result
   end
 
   test "'let' should create it's scope and bind arguments sequentially" do
