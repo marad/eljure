@@ -5,7 +5,7 @@ defmodule Eljure.Printer do
   def show(bool(true)), do: "true"
   def show(bool(false)), do: "false"
   def show(symbol(s)), do: to_string(s)
-  def show(int(i)), do: to_string(i)
+  def show(int(i,_)), do: to_string(i)
   def show(float(f)), do: to_string(f)
   def show(string(s)), do: "\"#{s}\""
   def show(keyword(k)), do: ":#{k}"
