@@ -58,4 +58,9 @@ defmodule EljureTest.Reader do
     assert_raise SyntaxError, fn -> read "}" end
   end
 
+  test "syntax error when missing end of list/vector/map" do
+    assert_raise SyntaxError, fn -> read "(" end
+    assert_raise SyntaxError, fn -> read "[" end
+    assert_raise SyntaxError, fn -> read "{" end
+  end
 end

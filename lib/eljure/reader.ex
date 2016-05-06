@@ -38,18 +38,18 @@ defmodule Eljure.Reader do
     end
   end
 
-  defp read_list(tokens) do
-    { l, rest } = read_sequence(List.delete_at(tokens, 0), [], ")")
+  defp read_list([_ | tokens]) do
+    { l, rest } = read_sequence(tokens, [], ")")
     { list(l, nil), rest }
   end
 
-  defp read_vector(tokens) do
-    { v, rest } = read_sequence(List.delete_at(tokens, 0), [], "]")
+  defp read_vector([_ | tokens]) do
+    { v, rest } = read_sequence(tokens, [], "]")
     { vector(v, nil), rest }
   end
 
-  defp read_map(tokens) do
-    { m, rest } = read_sequence(List.delete_at(tokens, 0), [], "}")
+  defp read_map([_ | tokens]) do
+    { m, rest } = read_sequence(tokens, [], "}")
    
     { map(m 
           |> Enum.chunk(2)
