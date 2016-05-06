@@ -36,12 +36,12 @@ defmodule Eljure.Reader do
 
   defp read_list(tokens) do
     { l, rest } = read_sequence(List.delete_at(tokens, 0), [], ")")
-    { list(l), rest }
+    { list(l, nil), rest }
   end
 
   defp read_vector(tokens) do
     { v, rest } = read_sequence(List.delete_at(tokens, 0), [], "]")
-    { vector(v), rest }
+    { vector(v, nil), rest }
   end
 
   defp read_map(tokens) do
@@ -49,7 +49,7 @@ defmodule Eljure.Reader do
    
     { map(m 
           |> Enum.chunk(2)
-          |> Enum.into(%{}, fn [k, v] -> {k, v} end) ), rest }
+          |> Enum.into(%{}, fn [k, v] -> {k, v} end), nil ), rest }
   end
 
   defp read_sequence([], acc, _stop) do
@@ -71,28 +71,28 @@ defmodule Eljure.Reader do
 
   defp read_quote(name, [_ | tokens]) do
     { form, rest } = read_form(tokens)
-    { list([symbol(name), form]), rest }
+    { list([symbol(name, nil), form], nil), rest }
   end
 
   defp read_atom("nil"), do: nil
-  defp read_atom("true"), do: bool(true)
-  defp read_atom("false"), do: bool(false)
-  defp read_atom(":" <> tail), do: keyword(tail)
+  defp read_atom("true"), do: bool(true, nil)
+  defp read_atom("false"), do: bool(false, nil)
+  defp read_atom(":" <> tail), do: keyword(tail, nil)
   defp read_atom(token) do
     cond do
       String.starts_with?(token, "\"") and String.ends_with?(token, "\"") ->
         string(token
                |> String.slice(1..-2)
-               |> String.replace("\\\\", "\\"))
+               |> String.replace("\\\\", "\\"), nil)
 
       is_integer?(token) ->
-        int(Integer.parse(token) |> elem(0))
+        int(Integer.parse(token) |> elem(0), nil)
 
       is_float?(token) ->
-        float(Float.parse(token) |> elem(0))
+        float(Float.parse(token) |> elem(0), nil)
 
       true ->
-        symbol(token)
+        symbol(token, nil)
     end
   end
   

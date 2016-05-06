@@ -5,15 +5,15 @@ defmodule EljureTest.Reader do
   import Eljure.Types
 
   test "should read integers" do
-    assert int(42) == read("42")
+    assert int(42, nil) == read("42")
   end
 
   test "should read keywords" do
-    assert keyword("kw") == read(":kw")
+    assert keyword("kw", nil) == read(":kw")
   end
 
   test "should read strings" do
-    assert string("test string") == read("\"test string\"")
+    assert string("test string", nil) == read("\"test string\"")
   end
 
   test "should read nil" do
@@ -21,22 +21,22 @@ defmodule EljureTest.Reader do
   end
 
   test "should read true and false" do
-    assert bool(true) == read("true")
-    assert bool(false) == read("false")
+    assert bool(true, nil) == read("true")
+    assert bool(false, nil) == read("false")
   end
 
   test "should read symbols" do
-    assert symbol("my-symbol") == read("my-symbol")
+    assert symbol("my-symbol", nil) == read("my-symbol")
   end
 
   test "should read lists/vectors/maps" do
-    assert list([symbol("+"), int(1), int(2)]) == read("(+ 1 2)")
-    assert vector([int(1), int(2), int(3)]) == read("[1 2 3]")
-    assert map(%{keyword("key") => string("value")}) == read("{:key \"value\"}")
+    assert list([symbol("+", nil), int(1, nil), int(2, nil)], nil) == read("(+ 1 2)")
+    assert vector([int(1, nil), int(2, nil), int(3, nil)], nil) == read("[1 2 3]")
+    assert map(%{keyword("key", nil) => string("value", nil)}, nil) == read("{:key \"value\"}")
   end
 
   test "should read quote" do
-    assert list([symbol("quote"), symbol("a")]) == read("'a")
+    assert list([symbol("quote", nil), symbol("a", nil)], nil) == read("'a")
   end
 
   test "should read '`' as quasiquote" do

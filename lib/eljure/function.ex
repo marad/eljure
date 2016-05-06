@@ -15,15 +15,15 @@ defmodule Eljure.Function do
 
   def prepare_arg_bindings(arg_names, arg_values, check_arity \\ true) do
     case { arg_names, arg_values } do
-      { [symbol("&"), arg_name], values } ->
-        [ [ arg_name, vector(values) ] ]
+      { [symbol("&",_), arg_name], values } ->
+        [ [ arg_name, vector(values, nil) ] ]
 
       { [arg_name | names], [arg_value | values] } ->
         [ [ arg_name, arg_value ] | prepare_arg_bindings(names, values, check_arity) ]
 
       { [], [] } -> []
       { [], _ } -> if check_arity do raise Eljure.Error.ArityError else [] end
-      { [symbol(_)=arg_name | names], [] } ->
+      { [symbol(_,_)=arg_name | names], [] } ->
         if check_arity do
           raise Eljure.Error.ArityError
         else
@@ -40,16 +40,18 @@ defmodule Eljure.Function do
 
   defp destructure acc, bindings do
     case bindings do
-      [ [vector(names), vector(values)] | rest ] ->
+      [ [vector(names,_), vector(values,_)] | rest ] ->
         destructured_bindings = destructure(prepare_arg_bindings(names, values, false))
         destructure(acc ++ destructured_bindings, rest)
 
-      [ [map(%{keyword("keys") => vector(names)}), map(value_map)] | rest ] ->
-        values = Enum.map(names, fn symbol(name,_) -> Map.get(value_map, keyword(name)) end)
+        #FIXME: nils below
+      [ [map(%{keyword("keys", nil) => vector(names, nil)}, m), map(value_map, _)] | rest ] ->
+        #FIXME: Map.get will net work if keyword (the key) has metadata
+        values = Enum.map(names, fn symbol(name,_) -> Map.get(value_map, keyword(name, nil)) end)
         destructured_bindings = destructure(prepare_arg_bindings(names, values, false))
         destructure(acc ++ destructured_bindings, rest)
 
-      [ [map(name_map), map(value_map)] | rest ] ->
+      [ [map(name_map, _), map(value_map, _)] | rest ] ->
         {names, values} = extract_map_bindings(name_map, value_map)
         destructured_bindings = destructure(prepare_arg_bindings(names, values, false))
         destructure(acc ++ destructured_bindings, rest)
@@ -60,13 +62,14 @@ defmodule Eljure.Function do
 
   defp extract_map_bindings name_map, value_map do
     name_list = Enum.map(name_map, fn {name, _} -> name end)
+    #FIXME: Map.get will net work if keyword (the key) has metadata (idk if this applies here)
     value_list = Enum.map(name_map, fn {_, key} -> Map.get(value_map, key) end)
     { name_list, value_list }
   end
 
   def bind_params bindings, scope, eval_values \\ false do
     case bindings do
-      [ [ symbol(name), value] | rest ] ->
+      [ [ symbol(name, _), value] | rest ] ->
         case eval_values do
           true ->
             { evaled, _ } = Evaluator.eval(value, scope)
@@ -82,8 +85,8 @@ defmodule Eljure.Function do
 
   def apply applicable, args do
     case applicable do
-      macro(f) -> Kernel.apply(f, [args])
-      function(f) -> Kernel.apply(f, [args])
+      macro(f, _) -> Kernel.apply(f, [args])
+      function(f, _) -> Kernel.apply(f, [args])
       _ -> raise Eljure.Error.EvalError, "#{show applicable} is not a function"
     end
   end

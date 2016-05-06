@@ -5,20 +5,20 @@ defmodule Eljure.Core do
 
   def create_root_scope do
     Scope.new %{
-      "+"=> function(&plus/1),
-      "-"=> function(&minus/1),
-      "*"=> function(&mult/1),
-      "/"=> function(&divide/1),
-      "read-string" => function(&read_string/1),
-      "slurp" => function(&slurp/1),
-      "println" => function(&println/1),
-      "cons" => function(&cons/1),
-      "concat" => function(&concat/1),
-      "str" => function(&str/1),
-      "list"=> function(&list_func/1),
-      "vector"=> function(&vector_func/1),
-      "with-meta"=> function(&with_meta/1),
-      "meta"=> function(&get_meta/1),
+      "+"=> function(&plus/1, nil),
+      "-"=> function(&minus/1, nil),
+      "*"=> function(&mult/1, nil),
+      "/"=> function(&divide/1, nil),
+      "read-string" => function(&read_string/1, nil),
+      "slurp" => function(&slurp/1, nil),
+      "println" => function(&println/1, nil),
+      "cons" => function(&cons/1, nil),
+      "concat" => function(&concat/1, nil),
+      "str" => function(&str/1, nil),
+      "list"=> function(&list_func/1, nil),
+      "vector"=> function(&vector_func/1, nil),
+      "with-meta"=> function(&with_meta/1, nil),
+      "meta"=> function(&get_meta/1, nil),
     }
   end
 
@@ -27,19 +27,19 @@ defmodule Eljure.Core do
   end
 
   def plus args do
-    int( Enum.reduce(values(args), &+/2) )
+    int( Enum.reduce(values(args), &+/2), nil )
   end
 
   def minus args do
-    int( Enum.reduce(values(args), &(&2 - &1)) )
+    int( Enum.reduce(values(args), &(&2 - &1)), nil )
   end
 
   def mult args do
-    int( Enum.reduce(values(args), &*/2) )
+    int( Enum.reduce(values(args), &*/2), nil)
   end
 
   def divide args do
-    int( Enum.reduce(values(args), &(div &2, &1)) )
+    int( Enum.reduce(values(args), &(div &2, &1)), nil )
 
   end
 
@@ -47,9 +47,9 @@ defmodule Eljure.Core do
     Eljure.Reader.read(value(str_expr))
   end
 
-  def slurp [string(file_name) | _] do
+  def slurp [string(file_name, nil) | _] do
     case File.read(file_name) do
-      {:ok, body} -> string(body)
+      {:ok, body} -> string(body, nil)
       _ -> raise "No file #{file_name}"
     end
   end
@@ -74,21 +74,21 @@ defmodule Eljure.Core do
     result = args
              |> Enum.map(&value/1)
              |> Enum.reduce(&(&2 ++ &1))
-    list(result)
+    list(result, nil)
   end
 
   def str args do
     string(args
           |> Enum.map(&as_string/1)
-          |> Enum.join(""))
+          |> Enum.join(""), nil)
   end
 
   def list_func args do
-    list(args)
+    list(args, nil)
   end
 
   def vector_func args do
-    vector(args)
+    vector(args, nil)
   end
 
   def with_meta args do

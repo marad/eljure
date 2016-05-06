@@ -7,35 +7,35 @@ defmodule EljureTest.Function do
   alias Eljure.Reader
 
   test "preparing bindings for function" do
-    names = [symbol("a"), symbol("b")]
-    values = [int(1), int(2)]
+    names = [symbol("a", nil), symbol("b", nil)]
+    values = [int(1, nil), int(2, nil)]
 
     result = prepare_arg_bindings(names, values)
 
-    assert [ [ symbol("a"), int(1) ],
-             [ symbol("b"), int(2) ] ] == result
+    assert [ [ symbol("a", nil), int(1, nil) ],
+             [ symbol("b", nil), int(2, nil) ] ] == result
   end
 
   test "preparing bindings arity checks" do
-    names = [symbol("a")]
-    values = [int(1), int(2)]
+    names = [symbol("a", nil)]
+    values = [int(1, nil), int(2, nil)]
 
     assert_raise Eljure.Error.ArityError, fn ->
       prepare_arg_bindings(names, values)
     end
 
-    assert [ [symbol("a"), int(1)] ] == prepare_arg_bindings(names, values, false)
+    assert [ [symbol("a", nil), int(1, nil)] ] == prepare_arg_bindings(names, values, false)
 
   end
 
   test "vararg bindings" do
-    names = ["a", "&", "b"] |> Enum.map(&symbol/1)
-    values = [1, 2, 3] |> Enum.map(&int/1)
+    names = ["a", "&", "b"] |> Enum.map(&(symbol &1, nil))
+    values = [1, 2, 3] |> Enum.map(&(int &1, nil))
 
     result = prepare_arg_bindings(names, values)
 
-    assert [ [symbol("a"), int(1)],
-             [symbol("b"), vector([int(2), int(3)])] ] == result
+    assert [ [symbol("a", nil), int(1, nil)],
+             [symbol("b", nil), vector([int(2, nil), int(3, nil)], nil)] ] == result
   end
 
   test "destructuring [a b c]" do
@@ -45,9 +45,9 @@ defmodule EljureTest.Function do
 
     result = destructure bindings
 
-    assert [ [symbol("a"), int(1)],
-             [symbol("b"), int(2)],
-             [symbol("c"), int(3)] ] == result
+    assert [ [symbol("a", nil), int(1, nil)],
+             [symbol("b", nil), int(2, nil)],
+             [symbol("c", nil), int(3, nil)] ] == result
   end
 
   test "destructuring [a & b]" do
@@ -57,8 +57,8 @@ defmodule EljureTest.Function do
 
     result = destructure bindings
 
-    assert [ [symbol("a"), int(1)],
-             [symbol("b"), vector([int(2), int(3)])] ] == result
+    assert [ [symbol("a", nil), int(1, nil)],
+             [symbol("b", nil), vector([int(2, nil), int(3, nil)], nil)] ] == result
   end
 
   test "destructuring {a :x b :y}" do
@@ -68,8 +68,8 @@ defmodule EljureTest.Function do
 
     result = destructure bindings
 
-    assert [ [symbol("a"), int(1)],
-             [symbol("b"), int(2)] ] == result
+    assert [ [symbol("a", nil), int(1, nil)],
+             [symbol("b", nil), int(2, nil)] ] == result
   end
 
   test "destructuring {:keys [a b]}" do
@@ -79,19 +79,19 @@ defmodule EljureTest.Function do
 
     result = destructure bindings
 
-    assert [ [symbol("a"), int(1)],
-             [symbol("b"), int(2)] ] == result
+    assert [ [symbol("a", nil), int(1, nil)],
+             [symbol("b", nil), int(2, nil)] ] == result
   end
 
   test "binding params" do
     scope = Scope.new
-    bindings = [ [ symbol("i"), int(3) ],
-                 [ symbol("s"), string("hello") ] ]
+    bindings = [ [ symbol("i", nil), int(3, nil) ],
+                 [ symbol("s", nil), string("hello", nil) ] ]
 
     result = bind_params bindings, scope
 
-    assert int(3) == Scope.get(scope, "i")
-    assert string("hello") == Scope.get(scope, "s")
+    assert int(3, nil) == Scope.get(scope, "i")
+    assert string("hello", nil) == Scope.get(scope, "s")
     assert scope == result
   end
 

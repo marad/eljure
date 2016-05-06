@@ -6,14 +6,14 @@ defmodule EljureTest.Quasiquote do
   alias Eljure.Reader
 
   test "is_pair? function" do
-    assert false == is_pair? list([])
-    assert true  == is_pair? list([int(1)])
-    assert true  == is_pair? list([int(2), int(3)])
+    assert false == is_pair? list([], nil)
+    assert true  == is_pair? list([int(1, nil)], nil)
+    assert true  == is_pair? list([int(2, nil), int(3, nil)], nil)
   end
 
   test "quasiquoting simple ast" do
-    ast = int(5)
-    assert list([symbol("quote"), ast]) == quasiquote ast
+    ast = int(5, nil)
+    assert list([symbol("quote", nil), ast], nil) == quasiquote ast
   end
 
   test "quasiquoting unquoted ast" do

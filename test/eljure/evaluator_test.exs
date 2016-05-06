@@ -7,84 +7,84 @@ defmodule EljureTest.Evaluator do
   alias Eljure.Reader
 
   defp sumFunc args do
-    int( Enum.reduce(Enum.map(args, &value/1), &+/2) )
+    int( Enum.reduce(Enum.map(args, &value/1), &+/2), nil)
   end
 
   test "should eval symbol to it's value" do
-    scope = Scope.put(Scope.new, "number", int(42))
-    assert {int(42), scope} == eval symbol("number"), scope
+    scope = Scope.put(Scope.new, "number", int(42, nil))
+    assert {int(42, nil), scope} == eval symbol("number", nil), scope
   end
 
   test "should eval symbol from parent scope" do
-    scope = Scope.put(Scope.new, "number", int(42))
+    scope = Scope.put(Scope.new, "number", int(42, nil))
     child_scope = Scope.child(scope)
-    assert {int(42), child_scope} == eval symbol("number"), child_scope
+    assert {int(42, nil), child_scope} == eval symbol("number", nil), child_scope
   end
 
   test "should raise error when symbol is not found" do
     scope = Scope.new
     assert_raise RuntimeError, "Undefined symbol: \"sym\"", fn ->
-      eval(symbol("sym"), scope)
+      eval(symbol("sym", nil), scope)
     end
   end
 
   test "should evaluate atoms to themselves" do
     scope = Scope.new
-    assert {int(42), scope}   == eval int(42), scope
-    assert {string("s"), scope}   == eval string("s"), scope
-    assert {map(%{a: 2}), scope}  == eval map(%{a: 2}), scope
-    assert {keyword("kw"), scope} == eval keyword("kw"), scope
-    assert {vector([1, 2]), scope} == eval vector([1, 2]), scope
+    assert {int(42, nil), scope}   == eval int(42, nil), scope
+    assert {string("s", nil), scope}   == eval string("s", nil), scope
+    assert {map(%{a: 2}, nil), scope}  == eval map(%{a: 2}, nil), scope
+    assert {keyword("kw", nil), scope} == eval keyword("kw", nil), scope
+    assert {vector([1, 2], nil), scope} == eval vector([1, 2], nil), scope
   end
 
   test "should eval lists as functions" do
     # given
     scope = Scope.new(%{
-      "+" => function(&sumFunc/1),
-      "a" => int(1),
-      "b" => int(2)
+      "+" => function(&sumFunc/1, nil),
+      "a" => int(1, nil),
+      "b" => int(2, nil)
     })
     expr = Reader.read "(+ a b)"
 
     # expect
-   assert {int(3), scope} == eval expr, scope
+   assert {int(3, nil), scope} == eval expr, scope
   end
 
   test "should evaluate vector tokens" do
     scope = Scope.new %{
-      "a" => int(3)
+      "a" => int(3, nil)
     }
     expr = Reader.read "[1 2 a]"
-    assert {vector([int(1), int(2), int(3)]), scope} == eval expr, scope
+    assert {vector([int(1, nil), int(2, nil), int(3, nil)], nil), scope} == eval expr, scope
   end
 
   test "should evaluate map tokens" do
     scope = Scope.new %{
-      "a" => int(3)
+      "a" => int(3, nil)
     }
     expr = Reader.read "{:a a}"
-    assert {map(%{keyword("a") => int(3)}), scope} == eval expr, scope
+    assert {map(%{keyword("a", nil) => int(3, nil)}, nil), scope} == eval expr, scope
   end
 
   test "'def' should define variables" do
     scope = Scope.new
     expr = Reader.read "(def sym 5)"
     eval expr, scope
-    assert int(5) == Scope.get(scope, "sym")
+    assert int(5, nil) == Scope.get(scope, "sym")
   end
 
   test "'def' should eval value to be set" do
     # given
-    scope = Scope.put(Scope.new, "+", function(&sumFunc/1))
+    scope = Scope.put(Scope.new, "+", function(&sumFunc/1, nil))
     expr = Reader.read "(def sym (+ 1 2))"
 
     # when
     {result, updated_scope} = eval expr, scope
 
     #then
-    assert symbol("sym") == result
+    assert symbol("sym", nil) == result
     assert scope == updated_scope
-    assert int(3) == Scope.get(updated_scope, "sym")
+    assert int(3, nil) == Scope.get(updated_scope, "sym")
   end
 
   test "'fn' should create a function" do
@@ -97,7 +97,7 @@ defmodule EljureTest.Evaluator do
 
     # then
     assert scope == updated_scope
-    assert int(5) == result
+    assert int(5, nil) == result
   end
 
   test "'&' in fn argument list" do
@@ -107,12 +107,12 @@ defmodule EljureTest.Evaluator do
     {result, updated_scope} = eval expr, scope
 
     assert scope == updated_scope
-    assert vector([int(1), vector([int(2), int(3), int(4)])]) == result
+    assert vector([int(1, nil), vector([int(2, nil), int(3, nil), int(4, nil)], nil)], nil) == result
   end
 
   test "'let' should create it's scope and bind arguments sequentially" do
     # given
-    scope = Scope.put(Scope.new, "+", function(&sumFunc/1))
+    scope = Scope.put(Scope.new, "+", function(&sumFunc/1, nil))
     expr = Reader.read "(let [a 5 b (+ a 1)] b)"
 
     # when
@@ -120,7 +120,7 @@ defmodule EljureTest.Evaluator do
 
     # then
     assert scope == updated_scope
-    assert int(6) == result
+    assert int(6, nil) == result
 
   end
 
@@ -133,54 +133,54 @@ defmodule EljureTest.Evaluator do
     {result, updated_scope} = eval expr, scope
 
     # then
-    assert int(5) == Scope.get(updated_scope, "a")
-    assert int(5) == result
+    assert int(5, nil) == Scope.get(updated_scope, "a")
+    assert int(5, nil) == result
   end
 
   test "'if' special form" do
     scope = Scope.new
-            |> Scope.put("t", int(1))
-            |> Scope.put("f", int(0))
-    assert {int(1), scope} == eval(Reader.read("(if true t f)"), scope)
-    assert {int(0), scope} == eval(Reader.read("(if false t f)"), scope)
-    assert {int(0), scope} == eval(Reader.read("(if nil t f)"), scope)
+            |> Scope.put("t", int(1, nil))
+            |> Scope.put("f", int(0, nil))
+    assert {int(1, nil), scope} == eval(Reader.read("(if true t f)"), scope)
+    assert {int(0, nil), scope} == eval(Reader.read("(if false t f)"), scope)
+    assert {int(0, nil), scope} == eval(Reader.read("(if nil t f)"), scope)
   end
 
   test "'eval' should evaluate ast" do
     scope = Scope.new %{
-      "+" => function(&sumFunc/1),
-      "a" => int(5)
+      "+" => function(&sumFunc/1, nil),
+      "a" => int(5, nil)
     }
     expr = Reader.read "(eval (+ a 1))"
-    assert  {int(6), scope} == eval(expr, scope)
+    assert  {int(6, nil), scope} == eval(expr, scope)
   end
 
   test "'eval' should evaluate ast from symbol" do
     scope = Scope.new %{
-      "+" => function(&sumFunc/1),
-      "a" => int(5),
+      "+" => function(&sumFunc/1, nil),
+      "a" => int(5, nil),
       "ast" => Reader.read "(+ a 1)"
     }
     expr = Reader.read "(eval ast)"
-    assert {int(6), scope} == eval(expr, scope)
+    assert {int(6, nil), scope} == eval(expr, scope)
   end
 
   test "'quote' should return unevaluated first form" do
     scope = Scope.new
     expr = Reader.read "(quote (1 2))"
-    assert { list([int(1), int(2)]), scope } == eval(expr, scope)
+    assert { list([int(1, nil), int(2, nil)], nil), scope } == eval(expr, scope)
   end
 
   test "'quasiquote' should return unevaluated first form" do
     scope = Eljure.Core.create_root_scope
-    assert { list([int(1)]), scope } == eval(Reader.read("(quasiquote (1))"), scope)
-    assert {int(2), scope } == eval(Reader.read("(quasiquote (unquote (+ 1 1)))"), scope)
+    assert { list([int(1, nil)], nil), scope } == eval(Reader.read("(quasiquote (1))"), scope)
+    assert {int(2, nil), scope } == eval(Reader.read("(quasiquote (unquote (+ 1 1)))"), scope)
   end
 
   test "complex quasiquote expression" do
     scope = Eljure.Core.create_root_scope
-            |> Scope.put("a", int(2))
-            |> Scope.put("b", vector([int(3), int(4)]))
+            |> Scope.put("a", int(2, nil))
+            |> Scope.put("b", vector([int(3, nil), int(4, nil)], nil))
     expr = Reader.read "(quasiquote (1 (unquote a) (splice-unquote b)))"
     expr2 = Reader.read "`(1 ~a ~@b)"
     expected = Reader.read "(1 2 3 4)"
@@ -190,16 +190,16 @@ defmodule EljureTest.Evaluator do
 
   test "'apply' should apply function to arguments" do
     scope = Scope.new %{
-      "+" => function(&sumFunc/1),
+      "+" => function(&sumFunc/1, nil),
     }
 
     #1
     with_arg_vector = Reader.read "(apply + 1 2 [3 4])"
-    assert { int(10), scope } == eval(with_arg_vector, scope)
+    assert { int(10, nil), scope } == eval(with_arg_vector, scope)
 
     #2
     without_arg_vector = Reader.read "(apply + 1 2 3)"
-    assert { int(6), scope } == eval(without_arg_vector, scope)
+    assert { int(6, nil), scope } == eval(without_arg_vector, scope)
   end
 
   test "calling native elixir functions" do
@@ -212,7 +212,7 @@ defmodule EljureTest.Evaluator do
 
     # then
     assert scope == updated_scope
-    assert string("erujle") == result
+    assert string("erujle", nil) == result
   end
 
   test "defining macro" do
@@ -253,7 +253,7 @@ defmodule EljureTest.Evaluator do
 
     # then
     assert scope == updated_scope
-    assert int(5) == result
+    assert int(5, nil) == result
 
   end
 
