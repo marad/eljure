@@ -3,6 +3,7 @@ defmodule EljureTest.Reader do
   doctest Eljure.Reader
   import Eljure.Reader
   import Eljure.Types
+  alias Eljure.Error.SyntaxError
 
   test "should read integers" do
     assert int(42, nil) == read("42")
@@ -48,7 +49,13 @@ defmodule EljureTest.Reader do
   end
 
   test "should read '~@' as splice-unquote" do
-    assert read("(splice-unquote (1 2 3)") == read("~@(1 2 3)")
+    assert read("(splice-unquote (1 2 3))") == read("~@(1 2 3)")
+  end
+
+  test "syntax error on unexpected end of list/vector/map" do
+    assert_raise SyntaxError, fn -> read ")" end
+    assert_raise SyntaxError, fn -> read "]" end
+    assert_raise SyntaxError, fn -> read "}" end
   end
 
 end

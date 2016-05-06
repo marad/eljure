@@ -5,6 +5,7 @@ defmodule EljureTest.Function do
   import Eljure.Types
   alias Eljure.Scope
   alias Eljure.Reader
+  alias Eljure.Error.ArityError
 
   test "preparing bindings for function" do
     names = [symbol("a", nil), symbol("b", nil)]
@@ -20,7 +21,7 @@ defmodule EljureTest.Function do
     names = [symbol("a", nil)]
     values = [int(1, nil), int(2, nil)]
 
-    assert_raise Eljure.Error.ArityError, fn ->
+    assert_raise ArityError, fn ->
       prepare_arg_bindings(names, values)
     end
 

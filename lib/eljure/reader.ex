@@ -1,6 +1,7 @@
 defmodule Eljure.Reader do
 
   import Eljure.Types
+  alias Eljure.Error.SyntaxError
 
   # This module is based on MAL code:
   # https://github.com/kanaka/mal/blob/master/elixir/lib/mal/reader.ex
@@ -29,6 +30,9 @@ defmodule Eljure.Reader do
       "`" -> read_quote("quasiquote", tokens)
       "~" -> read_quote("unquote", tokens)
       "~@" -> read_quote("splice-unquote", tokens)
+      ")" -> raise SyntaxError, message: "Read unexpected ')'"
+      "]" -> raise SyntaxError, message: "Read unexpected ']'"
+      "}" -> raise SyntaxError, message: "Read unexpected '}'"
       _ -> 
         { read_atom(next), rest }
     end
@@ -52,12 +56,8 @@ defmodule Eljure.Reader do
           |> Enum.into(%{}, fn [k, v] -> {k, v} end), nil ), rest }
   end
 
-  defp read_sequence([], acc, _stop) do
-    #raise Eljure.Error.SyntaxError, message: "Expected '#{stop}' but got nothing"
-
-    # Autocomplete missing parens
-    # Not sure if this is not a bad idea...
-    { Enum.reverse(acc), [] }
+  defp read_sequence([], _acc, stop) do
+    raise SyntaxError, message: "Expected '#{stop}' but got EOF"
   end
 
   defp read_sequence([head | tail] = tokens, acc, stop) do
