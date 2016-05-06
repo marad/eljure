@@ -2,6 +2,7 @@ defmodule Eljure.Core do
   alias Eljure.Scope
   import Eljure.Printer
   import Eljure.Types
+  alias Eljure.Error.ArityError
 
   def create_root_scope do
     Scope.new %{
@@ -50,7 +51,7 @@ defmodule Eljure.Core do
   def slurp [string(file_name, nil) | _] do
     case File.read(file_name) do
       {:ok, body} -> string(body, nil)
-      _ -> raise "No file #{file_name}"
+      _ -> raise "Cannot open file #{file_name}"
     end
   end
 
@@ -66,7 +67,7 @@ defmodule Eljure.Core do
     case args do
       [value, {type, [], meta}] -> {type, [value], meta}
       [value, {type, [_ | _] = list, meta}] -> {type, [value | list], meta}
-      _ -> raise "Invalid arguments! Expected value and a list."
+      _ -> raise ArityError
     end
   end
 
@@ -94,14 +95,14 @@ defmodule Eljure.Core do
   def with_meta args do
     case args do
       [{t, v, _}, m] -> {t, v, m}
-      _ -> raise Eljure.Error.ArityError
+      _ -> raise ArityError
     end
   end
 
   def get_meta args do
     case args do
       [{_, _, m}] -> m
-      _ -> raise Eljure.Error.ArityError
+      _ -> raise ArityError
     end
   end
 end

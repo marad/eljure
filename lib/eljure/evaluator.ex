@@ -1,6 +1,8 @@
 defmodule Eljure.Evaluator do
   import Kernel, except: [apply: 2]
   alias Eljure.Scope
+  alias Eljure.Error.ArityError
+  alias Eljure.Error.EvalError
   import Eljure.Types
   import Eljure.Printer
   import Eljure.Function
@@ -40,14 +42,14 @@ defmodule Eljure.Evaluator do
           {nil, _} -> eval(false_form, scope)
           _ -> eval(true_form, scope)
         end
-      _ -> raise Eljure.Error.EvalError, "Invalid expression: #{show form}."
+      _ -> raise EvalError, message: "Invalid expression: #{show form}."
     end
   end
 
   def eval list([symbol("quote", _) | args], _) = whole, scope do
     case args do
       [form] -> {form, scope}
-      _ -> raise Eljure.Error.ArityError, "Expected exactly one argument in #{show whole}."
+      _ -> raise ArityError, { "exactly one", show(whole) }
     end
   end
 
@@ -55,7 +57,7 @@ defmodule Eljure.Evaluator do
     case args do
       [form] -> eval Eljure.Quasiquote.quasiquote(form), scope
       #[form] -> { Eljure.Quasiquote.quasiquote(form), scope }
-      _ -> raise Eljure.Error.ArityError, "Expected exactly one argument in #{show whole}."
+      _ -> raise ArityError, { "exactly one", show(whole) }
     end
   end
 
@@ -82,13 +84,19 @@ defmodule Eljure.Evaluator do
   end
 
   def eval list([symbol("macroexpand-1", _), list([symbol("quote", _), form], _)], _), scope do
-    { first, _ } = eval List.first(value(form)), scope
-    case first do
-      macro(_, _) ->
-        macro_args = List.delete_at(value(form), 0)
-        { apply(first, macro_args), scope }
-      _ -> eval form, scope
+    case form do
+      list([macro_name | macro_args], _) ->
+        {macro_fn, _} = eval macro_name, scope
+        case macro_fn do
+          macro(_, _) -> { apply(macro_fn, macro_args), scope }
+          _ -> { form, scope }
+        end
+        _ -> { form, scope }
     end
+  end
+
+  def eval list([symbol("macroexpand-1", _) | _], _), scope do
+    raise ArityError, "Expected exactly one quoted argument"
   end
 
   def eval list([symbol(".", _), symbol(func_name, _) | arg_list], _), scope do
@@ -110,7 +118,8 @@ defmodule Eljure.Evaluator do
       [ast] ->
         {evaled_ast, _} = eval(ast, scope)
         eval(evaled_ast, scope)
-      _ -> "Arity exception! Expected one argument."
+      _ ->
+        raise ArityError, 1
     end
   end
 
@@ -130,7 +139,7 @@ defmodule Eljure.Evaluator do
         expr = apply(f, macro_args)
         eval(expr, scope)
 
-      _ -> raise Eljure.Error.EvalError, "#{show f} is not a function"
+      _ -> raise FunctionApplicationError, "#{show f} is not a function"
     end
   end
 

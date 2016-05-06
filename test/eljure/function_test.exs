@@ -1,11 +1,13 @@
 defmodule EljureTest.Function do
   use ExUnit.Case
   doctest Eljure.Function
+  import Kernel, except: [apply: 2]
   import Eljure.Function
   import Eljure.Types
   alias Eljure.Scope
   alias Eljure.Reader
   alias Eljure.Error.ArityError
+  alias Eljure.Error.FunctionApplicationError
 
   test "preparing bindings for function" do
     names = [symbol("a", nil), symbol("b", nil)]
@@ -17,7 +19,7 @@ defmodule EljureTest.Function do
              [ symbol("b", nil), int(2, nil) ] ] == result
   end
 
-  test "preparing bindings arity checks" do
+  test "preparing bindings arity checks (more arguments than expected)" do
     names = [symbol("a", nil)]
     values = [int(1, nil), int(2, nil)]
 
@@ -26,7 +28,18 @@ defmodule EljureTest.Function do
     end
 
     assert [ [symbol("a", nil), int(1, nil)] ] == prepare_arg_bindings(names, values, false)
+  end
 
+  test "preparing bindings arity checks (less arguments than expected)" do
+    names = [symbol("a", nil), symbol("b", nil)]
+    values = [int(1, nil)]
+
+    assert_raise ArityError, fn ->
+      prepare_arg_bindings(names, values)
+    end
+
+    assert [ [symbol("a", nil), int(1, nil)],
+             [symbol("b", nil), nil] ] == prepare_arg_bindings(names, values, false)
   end
 
   test "vararg bindings" do
@@ -86,14 +99,20 @@ defmodule EljureTest.Function do
 
   test "binding params" do
     scope = Scope.new
-    bindings = [ [ symbol("i", nil), int(3, nil) ],
+    bindings = [ [ symbol("i", nil), float(3.2, nil) ],
                  [ symbol("s", nil), string("hello", nil) ] ]
 
     result = bind_params bindings, scope
 
-    assert int(3, nil) == Scope.get(scope, "i")
+    assert float(3.2, nil) == Scope.get(scope, "i")
     assert string("hello", nil) == Scope.get(scope, "s")
     assert scope == result
+  end
+
+  test "applying non-function raises an error" do
+    assert_raise FunctionApplicationError, fn ->
+      apply(int(1, nil), [])
+    end
   end
 
 end

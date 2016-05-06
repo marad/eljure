@@ -5,6 +5,8 @@ defmodule EljureTest.Evaluator do
   import Eljure.Types
   alias Eljure.Scope
   alias Eljure.Reader
+  alias Eljure.Error.ArityError
+  alias Eljure.Error.EvalError
 
   defp sumFunc args do
     int( Enum.reduce(Enum.map(args, &value/1), &+/2), nil)
@@ -48,6 +50,7 @@ defmodule EljureTest.Evaluator do
 
     # expect
    assert {int(3, nil), scope} == eval expr, scope
+   assert_raise EvalError, fn -> eval Reader.read("(a)"), scope end
   end
 
   test "should evaluate vector tokens" do
@@ -146,6 +149,13 @@ defmodule EljureTest.Evaluator do
     assert {int(0, nil), scope} == eval(Reader.read("(if nil t f)"), scope)
   end
 
+  test "if throws error when arguments are missing" do
+    scope = Scope.new
+    assert_raise EvalError, fn -> eval(Reader.read("(if true :t)"), scope) end
+    assert_raise EvalError, fn -> eval(Reader.read("(if true)"), scope) end
+    assert_raise EvalError, fn -> eval(Reader.read("(if)"), scope) end
+  end
+
   test "'eval' should evaluate ast" do
     scope = Scope.new %{
       "+" => function(&sumFunc/1, nil),
@@ -165,16 +175,34 @@ defmodule EljureTest.Evaluator do
     assert {int(6, nil), scope} == eval(expr, scope)
   end
 
+  test "'eval' expects exactlye one argument" do
+    scope = Scope.new
+    assert_raise ArityError, fn -> eval Reader.read("(eval)"), scope end
+    assert_raise ArityError, fn -> eval Reader.read("(eval :a :b)"), scope end
+  end
+
   test "'quote' should return unevaluated first form" do
     scope = Scope.new
     expr = Reader.read "(quote (1 2))"
     assert { list([int(1, nil), int(2, nil)], nil), scope } == eval(expr, scope)
   end
 
+  test "'quote' expects exactly one argument" do
+    scope = Scope.new
+    assert_raise ArityError, fn -> eval(Reader.read("(quote)"), scope) end
+    assert_raise ArityError, fn -> eval(Reader.read("(quote :a :b)"), scope) end
+  end
+
   test "'quasiquote' should return unevaluated first form" do
     scope = Eljure.Core.create_root_scope
     assert { list([int(1, nil)], nil), scope } == eval(Reader.read("(quasiquote (1))"), scope)
     assert {int(2, nil), scope } == eval(Reader.read("(quasiquote (unquote (+ 1 1)))"), scope)
+  end
+
+  test "'quasiquote' expects exactly one argument" do
+    scope = Scope.new
+    assert_raise ArityError, fn -> eval(Reader.read("(quasiquote)"), scope) end
+    assert_raise ArityError, fn -> eval(Reader.read("(quasiquote :a :b)"), scope) end
   end
 
   test "complex quasiquote expression" do
@@ -239,6 +267,18 @@ defmodule EljureTest.Evaluator do
     # then
     assert scope == updated_scope
     assert expected_result == result
+  end
+
+  test "expanding not-macros should just return them" do
+    scope = Scope.new
+    expr = Reader.read "(macroexpand-1 'a)"
+    assert {symbol("a", nil), scope} == eval expr, scope
+  end
+
+  test "calling macroexpand-1 without any or with more than one arguments raises an error" do
+    scope = Scope.new
+    assert_raise ArityError, fn -> eval Reader.read("(macroexpand-1)"), scope end
+    assert_raise ArityError, fn -> eval Reader.read("(macroexpand-1 :a :b)"), scope end
   end
 
   test "running a macro" do

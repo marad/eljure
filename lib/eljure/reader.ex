@@ -6,6 +6,10 @@ defmodule Eljure.Reader do
   # This module is based on MAL code:
   # https://github.com/kanaka/mal/blob/master/elixir/lib/mal/reader.ex
 
+  def read("") do
+    nil
+  end
+
   def read(input) do
     input
     |> tokenize

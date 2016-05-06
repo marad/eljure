@@ -4,6 +4,9 @@ defmodule Eljure.Function do
   import Eljure.Printer
   alias Eljure.Scope
   alias Eljure.Evaluator
+  alias Eljure.Error.ArityError
+  alias Eljure.Error.DestructuringError
+  alias Eljure.Error.FunctionApplicationError
 
   def invoke_fn arg_names, body, scope, arg_values do
     func_scope = prepare_arg_bindings(arg_names, arg_values)
@@ -22,15 +25,13 @@ defmodule Eljure.Function do
         [ [ arg_name, arg_value ] | prepare_arg_bindings(names, values, check_arity) ]
 
       { [], [] } -> []
-      { [], _ } -> if check_arity do raise Eljure.Error.ArityError else [] end
-      { [symbol(_,_)=arg_name | names], [] } ->
+      { [], _ } -> if check_arity do raise ArityError else [] end
+      { [arg_name | names], [] } ->
         if check_arity do
-          raise Eljure.Error.ArityError
+          raise ArityError
         else
           [ [ arg_name, nil ] | prepare_arg_bindings(names, [], check_arity) ]
         end
-
-      { _, [] } -> if check_arity do raise Eljure.Error.ArityError else [] end
     end
   end
 
@@ -55,6 +56,8 @@ defmodule Eljure.Function do
         {names, values} = extract_map_bindings(name_map, value_map)
         destructured_bindings = destructure(prepare_arg_bindings(names, values, false))
         destructure(acc ++ destructured_bindings, rest)
+
+      # TODO: handle invalid cases (ie. trying to destructure map with vector)
 
       _ -> acc ++ bindings
     end
@@ -87,7 +90,7 @@ defmodule Eljure.Function do
     case applicable do
       macro(f, _) -> Kernel.apply(f, [args])
       function(f, _) -> Kernel.apply(f, [args])
-      _ -> raise Eljure.Error.EvalError, "#{show applicable} is not a function"
+      _ -> raise FunctionApplicationError, "#{show applicable} is not a function"
     end
   end
 

@@ -9,6 +9,10 @@ defmodule EljureTest.Reader do
     assert int(42, nil) == read("42")
   end
 
+  test "should read floats" do
+    assert float(2.3, nil) == read("2.3")
+  end
+
   test "should read keywords" do
     assert keyword("kw", nil) == read(":kw")
   end
@@ -62,5 +66,9 @@ defmodule EljureTest.Reader do
     assert_raise SyntaxError, fn -> read "(" end
     assert_raise SyntaxError, fn -> read "[" end
     assert_raise SyntaxError, fn -> read "{" end
+  end
+
+  test "reading empty string" do
+    assert nil == read ""
   end
 end
