@@ -44,9 +44,9 @@ defmodule Eljure.Function do
         destructured_bindings = destructure(prepare_arg_bindings(names, values, false))
         destructure(acc ++ destructured_bindings, rest)
 
-        #FIXME: nils below
-      [ [map(%{keyword("keys", nil) => vector(names, nil)}, m), map(value_map, _)] | rest ] ->
-        #FIXME: Map.get will net work if keyword (the key) has metadata
+        #FIXME: nil below
+      [ [map(%{keyword("keys", nil) => vector(names, _)}, m), map(value_map, _)] | rest ] ->
+        #FIXME: Map.get will not work if keyword (the key) has metadata
         values = Enum.map(names, fn symbol(name,_) -> Map.get(value_map, keyword(name, nil)) end)
         destructured_bindings = destructure(prepare_arg_bindings(names, values, false))
         destructure(acc ++ destructured_bindings, rest)
