@@ -2,16 +2,21 @@
 
 Eljure is general purpose Clojure-like programming language for Erlang's virtual machine.
 
-## Installation
 
-  1. Add eljure to your list of dependencies in mix.exs:
+## Building and Running
 
-        def deps do
-          [{:eljure, "~> 0.0.1"}]
-        end
+  You have to use elixir build tool called `mix`. Of course Erlang's virtual machine must be available as well.
+  Run the following in terminal:
 
-  2. Ensure eljure is started before your application:
+    mix escript.build
 
-        def application do
-          [applications: [:eljure]]
-        end
+  This will generate the escript executable in main project directory. Then just run
+
+    ./eljure
+
+  to start REPL or:
+
+    ./eljure program.elj
+
+  to execute Eljure program.
+
