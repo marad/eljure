@@ -34,5 +34,9 @@ defmodule Eljure.Error do
 
   defmodule FunctionApplicationError do
     defexception [:message]
+
+    def exception msg do
+      %FunctionApplicationError{message: msg}
+    end
   end
 end

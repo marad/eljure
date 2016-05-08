@@ -3,6 +3,7 @@ defmodule Eljure.Evaluator do
   alias Eljure.Scope
   alias Eljure.Error.ArityError
   alias Eljure.Error.EvalError
+  alias Eljure.Error.FunctionApplicationError
   import Eljure.Types
   import Eljure.Printer
   import Eljure.Function

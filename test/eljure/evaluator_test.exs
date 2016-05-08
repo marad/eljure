@@ -7,6 +7,7 @@ defmodule EljureTest.Evaluator do
   alias Eljure.Reader
   alias Eljure.Error.ArityError
   alias Eljure.Error.EvalError
+  alias Eljure.Error.FunctionApplicationError
 
   defp sumFunc args do
     int( Enum.reduce(Enum.map(args, &value/1), &+/2), nil)
@@ -50,7 +51,7 @@ defmodule EljureTest.Evaluator do
 
     # expect
    assert {int(3, nil), scope} == eval expr, scope
-   assert_raise EvalError, fn -> eval Reader.read("(a)"), scope end
+   assert_raise FunctionApplicationError, fn -> eval Reader.read("(a)"), scope end
   end
 
   test "should evaluate vector tokens" do
