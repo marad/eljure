@@ -133,6 +133,17 @@ defmodule EljureTest.Function do
              [symbol("x", nil), value] ] == result
   end
 
+  test "destructure with multiple bindings" do
+    bindings = [ [ symbol("a", nil), int(3, nil) ],
+                 [ Reader.read("[x & y]"), Reader.read("[1 2 3]") ] ]
+
+    result = destructure bindings
+
+    assert [ [ symbol("a", nil), int(3, nil) ],
+             [ symbol("x", nil), int(1, nil) ],
+             [ symbol("y", nil), vector([int(2, nil), int(3, nil)], nil) ] ] == result 
+  end
+
   test "binding params" do
     scope = Scope.new
     bindings = [ [ symbol("i", nil), float(3.2, nil) ],

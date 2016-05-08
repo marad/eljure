@@ -1,7 +1,10 @@
 defmodule Eljure.Types do
   def type {t, _, _} do t end
+  def type nil do nil end
+  def value nil do nil end
   def value {_, v, _} do v end
   def meta {_, _, m} do m end
+  def meta nil do nil end
 
   defmacro int(i, meta) do
     quote do

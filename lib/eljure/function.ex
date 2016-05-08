@@ -62,7 +62,11 @@ defmodule Eljure.Function do
 
       # TODO: handle invalid cases (ie. trying to destructure map with vector)
 
+      [ binding | rest ] ->
+        destructure(acc ++ [ binding ], rest)
+
       _ -> acc ++ bindings
+
     end
   end
 

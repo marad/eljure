@@ -7,6 +7,7 @@ defmodule Eljure.Prelude do
     read_eval(load_file, scope)
     read_eval(when_not, scope)
     read_eval(defn, scope)
+    read_eval(first_and_second, scope)
 
     scope
   end
@@ -38,6 +39,13 @@ defmodule Eljure.Prelude do
     """
     (defmacro defn [name args & body]
       `(def ~name (fn ~args ~@body)))
+    """
+  end
+
+  def first_and_second do
+    """
+    (defn first [[f _]] f)
+    (defn second [[_ s]] s)
     """
   end
 

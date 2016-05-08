@@ -10,6 +10,7 @@ defmodule Eljure.Core do
       "-"=> function(&minus/1, nil),
       "*"=> function(&mult/1, nil),
       "/"=> function(&divide/1, nil),
+      "="=> function(&eq/1, nil),
       "read-string" => function(&read_string/1, nil),
       "slurp" => function(&slurp/1, nil),
       "println" => function(&println/1, nil),
@@ -42,6 +43,10 @@ defmodule Eljure.Core do
   def divide args do
     int( Enum.reduce(values(args), &(div &2, &1)), nil )
 
+  end
+
+  def eq args do
+    bool( Enum.reduce(values(args), &(&1 == &2)), nil )
   end
 
   def read_string [str_expr | _] do
