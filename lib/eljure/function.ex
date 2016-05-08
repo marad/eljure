@@ -47,7 +47,6 @@ defmodule Eljure.Function do
         as_keyword_binding = extract_vector_as_keyword_binding(names, whole_form)
         destructure(acc ++ destructured_bindings ++ as_keyword_binding, rest)
 
-        #FIXME: nil below
       [ [map(%{keyword("keys", nil) => vector(names, _)} = name_map, m), map(value_map, _) = whole_form] | rest ] ->
         #FIXME: Map.get will not work if keyword (the key) has metadata
         values = Enum.map(names, fn symbol(name,_) -> Map.get(value_map, keyword(name, nil)) end)
