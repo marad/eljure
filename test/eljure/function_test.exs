@@ -75,6 +75,18 @@ defmodule EljureTest.Function do
              [symbol("b", nil), vector([int(2, nil), int(3, nil)], nil)] ] == result
   end
 
+  test "destructuring [a & b :as whole]" do
+    name = Reader.read "[a & b :as whole]"
+    value = Reader.read "[1 2 3]"
+    bindings = [ [name, value] ]
+
+    result = destructure bindings
+
+    assert [ [symbol("a", nil), int(1, nil)],
+             [symbol("b", nil), vector([int(2, nil), int(3, nil)], nil)],
+             [symbol("whole", nil), value] ] == result
+  end
+
   test "destructuring {a :x b :y}" do
     name = Reader.read "{a :x b :y}"
     value = Reader.read "{:x 1 :y 2}"
