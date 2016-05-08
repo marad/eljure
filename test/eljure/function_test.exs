@@ -86,6 +86,18 @@ defmodule EljureTest.Function do
              [symbol("b", nil), int(2, nil)] ] == result
   end
 
+  test "destructuring {a :x b :y :as whole}" do
+    name = Reader.read "{a :x b :y :as whole}"
+    value = Reader.read "{:x 1 :y 2}"
+    bindings = [ [name, value] ]
+
+    result = destructure bindings
+
+    assert [ [symbol("a", nil), int(1, nil)],
+             [symbol("b", nil), int(2, nil)],
+             [symbol("whole", nil), value] ] == result
+  end
+
   test "destructuring {:keys [a b]}" do
     name = Reader.read "{:keys [a b]}"
     value = Reader.read "{:a 1 :b 2}"
@@ -95,6 +107,18 @@ defmodule EljureTest.Function do
 
     assert [ [symbol("a", nil), int(1, nil)],
              [symbol("b", nil), int(2, nil)] ] == result
+  end
+
+  test "destructuring {:keys [a b] :as x}" do
+    name = Reader.read "{:keys [a b] :as x}"
+    value = Reader.read "{:a 1 :b 2}"
+    bindings = [ [name, value] ]
+
+    result = destructure bindings
+
+    assert [ [symbol("a", nil), int(1, nil)],
+             [symbol("b", nil), int(2, nil)],
+             [symbol("x", nil), value] ] == result
   end
 
   test "binding params" do

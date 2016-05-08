@@ -41,21 +41,33 @@ defmodule Eljure.Function do
 
   defp destructure acc, bindings do
     case bindings do
-      [ [vector(names,_), vector(values,_)] | rest ] ->
+      [ [vector(names,_), vector(values,_) = whole_form] | rest ] ->
         destructured_bindings = destructure(prepare_arg_bindings(names, values, false))
-        destructure(acc ++ destructured_bindings, rest)
+        #as_keyword_binding = extract_as_keyword_binding(names, whole_form)
+        as_keyword_binding = []
+        destructure(acc ++ destructured_bindings ++ as_keyword_binding, rest)
 
         #FIXME: nil below
-      [ [map(%{keyword("keys", nil) => vector(names, _)}, m), map(value_map, _)] | rest ] ->
+      [ [map(%{keyword("keys", nil) => vector(names, _)} = name_map, m), map(value_map, _) = whole_form] | rest ] ->
         #FIXME: Map.get will not work if keyword (the key) has metadata
         values = Enum.map(names, fn symbol(name,_) -> Map.get(value_map, keyword(name, nil)) end)
         destructured_bindings = destructure(prepare_arg_bindings(names, values, false))
-        destructure(acc ++ destructured_bindings, rest)
+        as_keyword_binding = if Map.has_key?(name_map, keyword("as", nil))  do
+          [ [ Map.get(name_map, keyword("as", nil)), whole_form ] ]
+        else
+          []
+        end
+        destructure(acc ++ destructured_bindings ++ as_keyword_binding, rest)
 
-      [ [map(name_map, _), map(value_map, _)] | rest ] ->
+      [ [map(name_map, _), map(value_map, _) = whole_form] | rest ] ->
         {names, values} = extract_map_bindings(name_map, value_map)
         destructured_bindings = destructure(prepare_arg_bindings(names, values, false))
-        destructure(acc ++ destructured_bindings, rest)
+        as_keyword_binding = if Map.has_key?(name_map, keyword("as", nil))  do
+          [ [ Map.get(name_map, keyword("as", nil)), whole_form ] ]
+        else
+          []
+        end
+        destructure(acc ++ destructured_bindings ++ as_keyword_binding, rest)
 
       # TODO: handle invalid cases (ie. trying to destructure map with vector)
 
@@ -64,11 +76,18 @@ defmodule Eljure.Function do
   end
 
   defp extract_map_bindings name_map, value_map do
-    name_list = Enum.map(name_map, fn {name, _} -> name end)
+    name_list = Enum.filter_map(name_map, 
+        fn {name, _} -> not is_as_keyword? name end,
+        fn {name, _} -> name end)
     #FIXME: Map.get will net work if keyword (the key) has metadata (idk if this applies here)
-    value_list = Enum.map(name_map, fn {_, key} -> Map.get(value_map, key) end)
+    value_list = Enum.filter_map(name_map,
+        fn {name, _} -> not is_as_keyword? name end,
+        fn {_, key} -> Map.get(value_map, key) end)
     { name_list, value_list }
   end
+
+  defp is_as_keyword? keyword("as", _) do true end
+  defp is_as_keyword? _ do false end
 
   def bind_params bindings, scope, eval_values \\ false do
     case bindings do
