@@ -72,9 +72,7 @@ defmodule Eljure.Function do
                       |> Enum.chunk(2, 1)
                       |> Enum.filter_map(
                           fn [k, _] -> is_as_keyword?(k) end,
-                          fn [_, name] -> name end)
-                      |> List.first
-    if as_keyword_name do [ [ as_keyword_name, whole_form ] ] else [] end
+                          fn [_, name] -> [name, whole_form] end)
   end
 
   defp extract_map_bindings name_map, value_map do
