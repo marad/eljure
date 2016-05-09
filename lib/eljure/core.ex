@@ -21,6 +21,17 @@ defmodule Eljure.Core do
       "vector"=> function(&vector_func/1, nil),
       "with-meta"=> function(&with_meta/1, nil),
       "meta"=> function(&get_meta/1, nil),
+      "nil?" => function(&nil?/1, nil),
+      "string?" => function(&string?/1, nil),
+      "symbol?" => function(&symbol?/1, nil),
+      "integer?" => function(&integer?/1, nil),
+      "float?" => function(&float?/1, nil),
+      "number?" => function(&number?/1, nil),
+      "map?" => function(&map?/1, nil),
+      "list?" => function(&list?/1, nil),
+      "vector?" => function(&vector?/1, nil),
+      "macro?" => function(&macro?/1, nil),
+      "function?" => function(&function?/1, nil),
     }
   end
 
@@ -110,4 +121,39 @@ defmodule Eljure.Core do
       _ -> raise ArityError
     end
   end
+
+  def nil? [nil] do bool(true, nil) end
+  def nil? _ do bool(false, nil) end
+
+  def string? [string(_, _)] do bool(true, nil) end
+  def string? _ do bool(false, nil) end
+
+  def symbol? [symbol(_, _)] do bool(true, nil) end
+  def symbol? _ do bool(false, nil) end
+
+  def integer? [int(_,_)] do bool(true, nil) end
+  def integer? _ do bool(false, nil) end
+
+  def float? [float(_,_)] do bool(true, nil) end
+  def float? _ do bool(false, nil) end
+
+  def number? [float(_,_)] do bool(true, nil) end
+  def number? [int(_,_)] do bool(true, nil) end
+  def number? _ do bool(false, nil) end
+
+  def map? [map(_, _)] do bool(true, nil) end
+  def map? _ do bool(false, nil) end
+
+  def list? [list(_, _)] do bool(true, nil) end
+  def list? _ do bool(false, nil) end
+
+  def vector? [vector(_,_)] do bool(true, nil) end
+  def vector? _ do bool(false, nil) end
+
+  def macro? [macro(_, _)] do bool(true, nil) end
+  def macro? _ do bool(false, nil) end
+
+  def function? [function(_, _)] do bool(true, nil) end
+  def function? _ do bool(false, nil) end
+
 end

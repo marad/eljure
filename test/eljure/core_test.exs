@@ -52,4 +52,43 @@ defmodule EljureTest.Core do
 
     assert m == get_meta [v]
   end
+
+  test "basic type checks" do
+    assert bool(true, nil) == nil? [nil]
+    assert bool(false, nil) == nil? [int(1, nil)]
+
+    assert bool(true, nil) == string? [string("test", nil)]
+    assert bool(false, nil) == string? [int(1, nil)]
+
+    assert bool(true, nil) == symbol? [symbol("s", nil)]
+    assert bool(false, nil) == symbol? [int(1, nil)]
+
+    assert bool(true, nil) == integer? [int(1, nil)]
+    assert bool(false, nil) == integer? [string("s", nil)]
+
+    assert bool(true, nil) == float? [float(1, nil)]
+    assert bool(false, nil) == float? [int(1, nil)]
+
+    assert bool(true, nil) == number? [float(1, nil)]
+    assert bool(true, nil) == number? [int(1, nil)]
+    assert bool(false, nil) == number? [symbol("s", nil)]
+
+    assert bool(true, nil) == map? [map(%{a: 1}, nil)]
+    assert bool(false, nil) == map? [string("s", nil)]
+
+    assert bool(true, nil) == list? [list([int(1, nil), int(2, nil)], nil)]
+    assert bool(false, nil) == list? [int(2, nil)]
+
+    assert bool(true, nil) == vector? [vector([int(1, nil), int(2, nil)], nil)]
+    assert bool(false, nil) == vector? [int(2, nil)]
+
+    assert bool(true, nil) == macro? [macro(&(&1), nil)]
+    assert bool(false, nil) == macro? [function(&(&1), nil)]
+    assert bool(false, nil) == macro? [int(1, nil)]
+
+    assert bool(true, nil) == function? [function(&(&1), nil)]
+    assert bool(false, nil) == function? [macro(&(&1), nil)]
+    assert bool(false, nil) == function? [int(1, nil)]
+  end
+
 end
