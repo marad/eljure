@@ -34,6 +34,7 @@ defmodule Eljure.Reader do
       "`" -> read_quote("quasiquote", tokens)
       "~" -> read_quote("unquote", tokens)
       "~@" -> read_quote("splice-unquote", tokens)
+      "^" -> read_meta(tokens)
       ")" -> raise SyntaxError, message: "Read unexpected ')'"
       "]" -> raise SyntaxError, message: "Read unexpected ']'"
       "}" -> raise SyntaxError, message: "Read unexpected '}'"
@@ -76,6 +77,12 @@ defmodule Eljure.Reader do
   defp read_quote(name, [_ | tokens]) do
     { form, rest } = read_form(tokens)
     { list([symbol(name, nil), form], nil), rest }
+  end
+
+  defp read_meta([_ | tokens]) do
+    { metadata, rest } = read_form(tokens)
+    { form, rest } = read_form(rest)
+    { list([symbol("with-meta", nil), form, metadata], nil), rest }
   end
 
   defp read_atom("nil"), do: nil

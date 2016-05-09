@@ -56,6 +56,10 @@ defmodule EljureTest.Reader do
     assert read("(splice-unquote (1 2 3))") == read("~@(1 2 3)")
   end
 
+  test "should read '^' as with-meta" do
+    assert read("(with-meta [1 2 3] {:a 1})") == read ("^{:a 1} [1 2 3]")
+  end
+
   test "syntax error on unexpected end of list/vector/map" do
     assert_raise SyntaxError, fn -> read ")" end
     assert_raise SyntaxError, fn -> read "]" end
