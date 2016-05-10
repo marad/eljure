@@ -60,6 +60,10 @@ defmodule EljureTest.Reader do
     assert read("(with-meta [1 2 3] {:a 1})") == read ("^{:a 1} [1 2 3]")
   end
 
+  test "should translate ^:keyword to ^{:keyword true}" do
+    assert read("(with-meta [1 2 3] {:keyword true})") == read("^:keyword [1 2 3]")
+  end
+
   test "syntax error on unexpected end of list/vector/map" do
     assert_raise SyntaxError, fn -> read ")" end
     assert_raise SyntaxError, fn -> read "]" end

@@ -80,9 +80,19 @@ defmodule Eljure.Reader do
   end
 
   defp read_meta([_ | tokens]) do
-    { metadata, rest } = read_form(tokens)
+    { meta_term, rest } = read_form(tokens)
+    metadata = translate_to_metadata(meta_term)
     { form, rest } = read_form(rest)
     { list([symbol("with-meta", nil), form, metadata], nil), rest }
+  end
+
+  defp translate_to_metadata(map(_, _) = m) do m end
+
+  defp translate_to_metadata(keyword(_, _) = k) do
+    map( Enum.into([{k, bool(true, nil)}], %{}, fn kv -> kv end), nil )
+    # I'd like to do this easier (as below) but elixir doesn't yet
+    # support it :(
+    #map(%{ k => bool(true, nil)}, nil)
   end
 
   defp read_atom("nil"), do: nil
