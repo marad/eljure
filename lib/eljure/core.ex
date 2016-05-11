@@ -155,5 +155,4 @@ defmodule Eljure.Core do
 
   def function? [function(_, _)] do bool(true, nil) end
   def function? _ do bool(false, nil) end
-
 end

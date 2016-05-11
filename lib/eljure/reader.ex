@@ -95,6 +95,10 @@ defmodule Eljure.Reader do
     #map(%{ k => bool(true, nil)}, nil)
   end
 
+  defp translate_to_metadata(symbol(_, _) = s) do
+    map( Enum.into([{keyword("tag",nil), s}], %{}, fn kv -> kv end), nil )
+  end
+
   defp read_atom("nil"), do: nil
   defp read_atom("true"), do: bool(true, nil)
   defp read_atom("false"), do: bool(false, nil)

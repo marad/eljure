@@ -8,6 +8,7 @@ defmodule Eljure.Prelude do
     read_eval(when_not, scope)
     read_eval(defn, scope)
     read_eval(first_and_second, scope)
+    read_eval(query_funcs, scope)
 
     scope
   end
@@ -46,6 +47,14 @@ defmodule Eljure.Prelude do
     """
     (defn first [[f _]] f)
     (defn second [[_ s]] s)
+    """
+  end
+
+  def query_funcs do
+    """
+    (defn zero? [x] (= x 0))
+    (defn true? [x] (= x true))
+    (defn false? [x] (= x false))
     """
   end
 
