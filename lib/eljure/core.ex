@@ -6,11 +6,15 @@ defmodule Eljure.Core do
 
   def create_root_scope do
     Scope.new %{
-      "+"=> function(&plus/1, nil),
-      "-"=> function(&minus/1, nil),
-      "*"=> function(&mult/1, nil),
-      "/"=> function(&divide/1, nil),
-      "="=> function(&eq/1, nil),
+      "+" => function(&plus/1, nil),
+      "-" => function(&minus/1, nil),
+      "*" => function(&mult/1, nil),
+      "/" => function(&divide/1, nil),
+      "=" => function(&eq/1, nil),
+      ">" => function(&gt/1, nil),
+      ">=" => function(&gte/1, nil),
+      "<" => function(&lt/1, nil),
+      "<=" => function(&lte/1, nil),
       "read-string" => function(&read_string/1, nil),
       "slurp" => function(&slurp/1, nil),
       "println" => function(&println/1, nil),
@@ -53,11 +57,46 @@ defmodule Eljure.Core do
 
   def divide args do
     int( Enum.reduce(values(args), &(div &2, &1)), nil )
-
   end
 
   def eq args do
     bool( Enum.reduce(values(args), &(&1 == &2)), nil )
+  end
+
+  def lt args do
+    result = values(args)
+    |> Enum.chunk(2,1)
+    |> Enum.map(fn [a, b] -> a < b end)
+    |> Enum.reduce(&(&1 && &2))
+
+    bool( result, nil )
+  end
+
+  def lte args do
+    result = values(args)
+    |> Enum.chunk(2,1)
+    |> Enum.map(fn [a, b] -> a <= b end)
+    |> Enum.reduce(&(&1 && &2))
+
+    bool( result, nil )
+  end
+
+  def gt args do
+    result = values(args)
+    |> Enum.chunk(2,1)
+    |> Enum.map(fn [a, b] -> a > b end)
+    |> Enum.reduce(&(&1 && &2))
+
+    bool( result, nil )
+  end
+
+  def gte args do
+    result = values(args)
+    |> Enum.chunk(2,1)
+    |> Enum.map(fn [a, b] -> a >= b end)
+    |> Enum.reduce(&(&1 && &2))
+
+    bool( result, nil )
   end
 
   def read_string [str_expr | _] do

@@ -91,4 +91,41 @@ defmodule EljureTest.Core do
     assert bool(false, nil) == function? [int(1, nil)]
   end
 
+  test "less than" do
+    assert bool(true,nil) == lt [int(1, nil), int(2,nil), int(3, nil)]
+    assert bool(false,nil) == lt [int(3, nil), int(2,nil), int(1, nil)]
+    assert bool(false,nil) == lt [int(1, nil), int(2,nil), int(0, nil)]
+    assert bool(false,nil) == lt [int(1,nil), int(1, nil)]
+  end
+
+  test "greater than" do
+    assert bool(true,nil) == gt [int(3, nil), int(2,nil), int(1, nil)]
+    assert bool(false,nil) == gt [int(1, nil), int(2,nil), int(3, nil)]
+    assert bool(false,nil) == gt [int(3, nil), int(2,nil), int(4, nil)]
+  end
+
+  test "less than or equal" do
+    {one, two, three} = {int(1,nil), int(2,nil), int(3,nil)}
+    {t, f} = { bool(true, nil), bool(false, nil) }
+
+    assert t == lte [one, two, three]
+    assert t == lte [one, one]
+    assert t == lte [one, two]
+    assert f == lte [one, three, two]
+    assert f == lte [three, two, one]
+    assert f == lte [two, one, one]
+  end
+
+  test "greater than or equal" do
+    {one, two, three} = {int(1,nil), int(2,nil), int(3,nil)}
+    {t, f} = { bool(true, nil), bool(false, nil) }
+
+    assert t == gte [three, two, one]
+    assert t == gte [one, one]
+    assert t == gte [two, one]
+    assert f == gte [one, three, two]
+    assert f == gte [one, two, three]
+    assert f == gte [one, one, two]
+  end
+
 end
