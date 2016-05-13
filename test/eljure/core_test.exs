@@ -91,6 +91,14 @@ defmodule EljureTest.Core do
     assert bool(false, nil) == function? [int(1, nil)]
   end
 
+  test "equals" do
+    {one, two} = {int(1,nil), int(2,nil)}
+    assert bool(true,nil) == eq [one, one, one]
+    assert bool(false,nil) == eq [one, two]
+    assert bool(false,nil) == eq [one, two, one]
+    assert bool(false,nil) == eq [one, one, two]
+  end
+
   test "less than" do
     assert bool(true,nil) == lt [int(1, nil), int(2,nil), int(3, nil)]
     assert bool(false,nil) == lt [int(3, nil), int(2,nil), int(1, nil)]

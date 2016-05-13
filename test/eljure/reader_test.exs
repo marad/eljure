@@ -5,6 +5,11 @@ defmodule EljureTest.Reader do
   import Eljure.Types
   alias Eljure.Error.SyntaxError
 
+  test "should skip forms starting with #_" do
+    result = read("[1 #_(hello world) 2]")
+    assert vector [int(1, nil), int(2,nil)], nil == result
+  end
+
   test "should read integers" do
     assert int(42, nil) == read("42")
   end

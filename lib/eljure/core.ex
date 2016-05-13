@@ -60,7 +60,11 @@ defmodule Eljure.Core do
   end
 
   def eq args do
-    bool( Enum.reduce(values(args), &(&1 == &2)), nil )
+    result = values(args)
+    |> Enum.chunk(2,1)
+    |> Enum.map(fn [a, b] -> a == b end)
+    |> Enum.reduce(&(&1 && &2))
+    bool( result, nil )
   end
 
   def lt args do

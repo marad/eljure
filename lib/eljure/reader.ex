@@ -22,7 +22,6 @@ defmodule Eljure.Reader do
     Regex.scan(regex, input, capture: :all_but_first)
     |> List.flatten
     |> List.delete_at(-1) # Remove the last match, which is an empty string
-    |> Enum.filter(fn token -> not String.starts_with?(token, "#_") end)
   end
 
   defp read_form([next | rest] = tokens) do
@@ -38,6 +37,7 @@ defmodule Eljure.Reader do
       ")" -> raise SyntaxError, message: "Read unexpected ')'"
       "]" -> raise SyntaxError, message: "Read unexpected ']'"
       "}" -> raise SyntaxError, message: "Read unexpected '}'"
+      "#_" -> skip_form(tokens)
       _ -> 
         { read_atom(next), rest }
     end
@@ -97,6 +97,11 @@ defmodule Eljure.Reader do
 
   defp translate_to_metadata(symbol(_, _) = s) do
     map( Enum.into([{keyword("tag",nil), s}], %{}, fn kv -> kv end), nil )
+  end
+
+  defp skip_form([_ | tokens]) do
+    {  _, rest } = read_form(tokens)
+    read_form(rest)
   end
 
   defp read_atom("nil"), do: nil
