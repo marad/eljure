@@ -22,6 +22,7 @@ defmodule Eljure.Reader do
     Regex.scan(regex, input, capture: :all_but_first)
     |> List.flatten
     |> List.delete_at(-1) # Remove the last match, which is an empty string
+    |> Enum.filter(&(not String.starts_with?(&1, ";")))
   end
 
   defp read_form([next | rest] = tokens) do
