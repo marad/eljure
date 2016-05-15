@@ -141,7 +141,7 @@ defmodule EljureTest.Function do
 
     assert [ [ symbol("a", nil), int(3, nil) ],
              [ symbol("x", nil), int(1, nil) ],
-             [ symbol("y", nil), vector([int(2, nil), int(3, nil)], nil) ] ] == result 
+             [ symbol("y", nil), vector([int(2, nil), int(3, nil)], nil) ] ] == result
   end
 
   test "binding params" do
@@ -154,6 +154,19 @@ defmodule EljureTest.Function do
     assert float(3.2, nil) == Scope.get(scope, "i")
     assert string("hello", nil) == Scope.get(scope, "s")
     assert scope == result
+  end
+
+  test "apply treat keyword as a function on maps" do
+    m  = map(%{ keyword("key", nil) => int(5, nil) }, nil)
+
+    assert int(5, nil) == apply(keyword("key", nil), [m])
+    assert int(3, nil) == apply(keyword("not-existing", nil), [m, int(3,nil)])
+    assert_raise ArityError, fn ->
+      apply(keyword("_", nil), [])
+    end
+    assert_raise ArityError, fn ->
+      apply(keyword("_", nil), [m, int(1,nil), int(2, nil)])
+    end
   end
 
   test "applying non-function raises an error" do

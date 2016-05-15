@@ -120,7 +120,19 @@ defmodule Eljure.Function do
     case applicable do
       macro(f, _) -> Kernel.apply(f, [args])
       function(f, _) -> Kernel.apply(f, [args])
+      keyword(_, _) = kw -> apply_keyword(kw, args)
       _ -> raise FunctionApplicationError, "#{show applicable} is not a function"
+    end
+  end
+
+  defp apply_keyword kw, args do
+    case args do
+      [m] -> apply_keyword(kw, [m, nil])
+      [map(m,_), default] ->
+        Map.get(m, kw, default)
+      [m, default] ->
+        raise FunctionApplicationError, "Keywords work as functions only for maps"
+      _ -> raise ArityError
     end
   end
 

@@ -295,7 +295,6 @@ defmodule EljureTest.Evaluator do
     # then
     assert scope == updated_scope
     assert int(5, nil) == result
-
   end
 
 end

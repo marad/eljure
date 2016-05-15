@@ -3,7 +3,6 @@ defmodule Eljure.Evaluator do
   alias Eljure.Scope
   alias Eljure.Error.ArityError
   alias Eljure.Error.EvalError
-  alias Eljure.Error.FunctionApplicationError
   import Eljure.Types
   import Eljure.Printer
   import Eljure.Function
@@ -131,16 +130,14 @@ defmodule Eljure.Evaluator do
     {f, _} = eval(fname, scope)
 
     case f do
-      function(_, _) ->
-        { args, _ } = eval_ast(list(args_ast, nil), scope)
-        { apply(f, args), scope }
-
       macro(_, _) ->
         macro_args = List.delete_at(ast, 0)
         expr = apply(f, macro_args)
         eval(expr, scope)
 
-      _ -> raise FunctionApplicationError, "#{show f} is not a function"
+      _ ->
+        { args, _ } = eval_ast(list(args_ast, nil), scope)
+        { apply(f, args), scope }
     end
   end
 
