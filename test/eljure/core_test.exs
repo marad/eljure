@@ -136,4 +136,16 @@ defmodule EljureTest.Core do
     assert f == gte [one, one, two]
   end
 
+  test "'apply' should apply function to arguments" do
+    f = function(&plus/1,nil)
+
+    #1
+    args = [int(1,nil), int(2,nil), vector([int(3,nil), int(4,nil)],nil)]
+    assert int(10, nil) == apply_func [f] ++ args
+
+    #2
+    args = [int(1,nil), int(2,nil), int(3,nil)]
+    assert int(6,nil) == apply_func [f] ++ args
+  end
+
 end

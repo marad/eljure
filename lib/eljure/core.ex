@@ -3,6 +3,7 @@ defmodule Eljure.Core do
   import Eljure.Printer
   import Eljure.Types
   alias Eljure.Error.ArityError
+  alias Eljure.Function
 
   def create_root_scope do
     Scope.new %{
@@ -36,6 +37,7 @@ defmodule Eljure.Core do
       "vector?" => function(&vector?/1, nil),
       "macro?" => function(&macro?/1, nil),
       "function?" => function(&function?/1, nil),
+      "apply" => function(&apply_func/1,nil),
     }
   end
 
@@ -162,6 +164,20 @@ defmodule Eljure.Core do
     case args do
       [{_, _, m}] -> m
       _ -> raise ArityError
+    end
+  end
+
+  def apply_func apply_args do
+    case apply_args do
+      [f | args] ->
+        case List.last(args) do
+          vector(arg_vec, _) ->
+            first_args = List.delete_at(args, -1)
+            Function.apply(f, first_args ++ arg_vec)
+
+          _ ->
+            Function.apply(f, args)
+        end
     end
   end
 

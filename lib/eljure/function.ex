@@ -1,5 +1,5 @@
 defmodule Eljure.Function do
-  import Kernel, except: [destructure: 2]
+  import Kernel, except: [destructure: 2, apply: 2]
   import Eljure.Types
   import Eljure.Printer
   alias Eljure.Scope

@@ -217,20 +217,6 @@ defmodule EljureTest.Evaluator do
     assert {expected, scope} == eval expr2, scope
   end
 
-  test "'apply' should apply function to arguments" do
-    scope = Scope.new %{
-      "+" => function(&sumFunc/1, nil),
-    }
-
-    #1
-    with_arg_vector = Reader.read "(apply + 1 2 [3 4])"
-    assert { int(10, nil), scope } == eval(with_arg_vector, scope)
-
-    #2
-    without_arg_vector = Reader.read "(apply + 1 2 3)"
-    assert { int(6, nil), scope } == eval(without_arg_vector, scope)
-  end
-
   test "calling native elixir functions" do
     # given
     scope = Scope.new
