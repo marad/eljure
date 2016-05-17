@@ -38,6 +38,7 @@ defmodule Eljure.Core do
       "macro?" => function(&macro?/1, nil),
       "function?" => function(&function?/1, nil),
       "apply" => function(&apply_func/1,nil),
+      "rest" => function(&rest/1,nil),
     }
   end
 
@@ -178,6 +179,15 @@ defmodule Eljure.Core do
           _ ->
             Function.apply(f, args)
         end
+    end
+  end
+
+  def rest args do
+    case args do
+      [] -> raise ArityError
+      [_, _ | _] -> raise ArityError
+      [vector([],_)] -> vector([],nil)
+      [vector([_ | tail],_)] -> vector(tail,nil)
     end
   end
 
