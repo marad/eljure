@@ -175,4 +175,23 @@ defmodule EljureTest.Core do
     end
   end
 
+  test "'count' function" do
+    l = list([int(1,nil), int(2,nil)],nil)
+    v = vector([int(1,nil), int(2,nil)],nil)
+
+    assert int(2, nil) == count [l]
+    assert int(2, nil) == count [v]
+    assert int(0, nil) == count [list([], nil)]
+    assert int(0, nil) == count [vector([], nil)]
+    assert int(0, nil) == count [nil]
+
+    assert_raise ArityError, fn ->
+      count [l, v]
+    end
+
+    assert_raise ArityError, fn ->
+      count []
+    end
+  end
+
 end
