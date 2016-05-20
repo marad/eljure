@@ -32,4 +32,20 @@ defmodule EljureTest.Types do
     assert int(6, nil) == Eljure.Function.apply(inc, [int(5, nil)])
   end
 
+  test "converting to eljure map to native map" do
+    assert %{"hello" => 5} == ast_to_native map(%{string("hello",nil) => int(5,nil)}, nil)
+  end
+
+  test "converting eljure vector to native list" do
+    assert [1, 2] == ast_to_native vector([int(1,nil), int(2,nil)], nil)
+  end
+
+  test "converting eljure list to native list" do
+    assert [1, 2] == ast_to_native list([int(1,nil), int(2,nil)], nil)
+  end
+
+  test "converting keyword to atom" do
+    assert :test == ast_to_native keyword("test",nil)
+  end
+
 end
