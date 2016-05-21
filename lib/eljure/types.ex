@@ -97,5 +97,21 @@ defmodule Eljure.Types do
   def native_to_ast(term) when is_function(term) do
     function( fn args -> native_to_ast(Kernel.apply(term, Enum.map(args, &value/1))) end, nil )
   end
+
+  def ast_to_native nil do nil end
+  def ast_to_native bool(b,_) do b end
+  def ast_to_native keyword(k,_) do String.to_atom(k) end
+  def ast_to_native string(s,_) do s end
+  def ast_to_native int(i,_) do i end
+  def ast_to_native float(f,_) do f end
+  def ast_to_native function(f,_) do f end
+  def ast_to_native macro(m,_) do m end
+  def ast_to_native vector(v,_) do Enum.map(v, &ast_to_native/1) end
+  def ast_to_native list(l,_) do Enum.map(l, &ast_to_native/1) end
+  def ast_to_native map(m,_) do
+    Enum.reduce(m, %{}, fn {k, v}, acc ->
+      Map.put(acc, ast_to_native(k), ast_to_native(v))
+    end)
+  end
 end
 

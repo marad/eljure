@@ -3,6 +3,7 @@ defmodule EljureTest.Core do
   doctest Eljure.Core
   import Eljure.Core
   import Eljure.Types
+  alias Eljure.Error.ArityError
 
   test "cons should add value at the beggining of a list" do
     args = [ int(5, nil), list([int(10, nil)], nil)]
@@ -146,6 +147,51 @@ defmodule EljureTest.Core do
     #2
     args = [int(1,nil), int(2,nil), int(3,nil)]
     assert int(6,nil) == apply_func [f] ++ args
+  end
+
+  test "'rest' function returns tail" do
+    vec = vector [int(1,nil), int(2,nil), int(3,nil)], nil
+    empty_vector = vector [], nil
+
+    assert vector [int(2,nil), int(3,nil)], nil == rest [vec]
+    assert empty_vector == rest [vector([int(1,nil)], nil)]
+  end
+
+  test "'rest' returns empty vector" do
+    empty_vector = vector [], nil
+    assert empty_vector == rest [empty_vector]
+  end
+
+  test "'rest' throws exception when no arguments are passed" do
+    assert_raise ArityError, fn ->
+      rest []
+    end
+  end
+
+  test "'rest' throws exception when too much args are passed" do
+    empty_vector = vector [], nil
+    assert_raise ArityError, fn ->
+      rest [empty_vector, empty_vector]
+    end
+  end
+
+  test "'count' function" do
+    l = list([int(1,nil), int(2,nil)],nil)
+    v = vector([int(1,nil), int(2,nil)],nil)
+
+    assert int(2, nil) == count [l]
+    assert int(2, nil) == count [v]
+    assert int(0, nil) == count [list([], nil)]
+    assert int(0, nil) == count [vector([], nil)]
+    assert int(0, nil) == count [nil]
+
+    assert_raise ArityError, fn ->
+      count [l, v]
+    end
+
+    assert_raise ArityError, fn ->
+      count []
+    end
   end
 
 end

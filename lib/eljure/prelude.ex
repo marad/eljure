@@ -9,6 +9,8 @@ defmodule Eljure.Prelude do
     read_eval(defn, scope)
     read_eval(first_and_second, scope)
     read_eval(query_funcs, scope)
+    read_eval(inc_dec, scope)
+    read_eval(reverse, scope)
 
     scope
   end
@@ -58,4 +60,16 @@ defmodule Eljure.Prelude do
     """
   end
 
+  def inc_dec do
+    """
+    (defn inc [x] (+ x 1))
+    (defn dec [x] (- x 1))
+    """
+  end
+
+  def reverse do
+    """
+    (defn reverse [xs] (. Enum.reverse xs))
+    """
+  end
 end

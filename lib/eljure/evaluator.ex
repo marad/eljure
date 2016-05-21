@@ -86,15 +86,12 @@ defmodule Eljure.Evaluator do
     args = arg_list
            |> Enum.map(&(eval(&1, scope)))
            |> Enum.map(&(elem(&1, 0)))
-           |> Enum.map(&show/1)
-           |> Enum.join(",")
+           |> Enum.map(&ast_to_native/1)
 
-    {invoke_native("#{func_name} #{args}"), scope}
+   result = invoke_native(func_name, args)
+
+   {native_to_ast(result), scope}
   end
-
-  #def eval list([symbol("elixir-eval"), string(code)]), scope do
-  #  {invoke_native(code), scope}
-  #end
 
   def eval list([symbol("eval", _) | args], _), scope do
     case args do
@@ -154,6 +151,14 @@ defmodule Eljure.Evaluator do
   defp invoke_native code do
     {result, _} = Code.eval_string code
     native_to_ast(result)
+  end
+
+  defp invoke_native func, args do
+    func_path = String.split(func, ".")
+    module_path = List.delete_at(func_path, -1)
+    func_name = List.last(func_path)
+
+    Kernel.apply(Module.concat(module_path), String.to_atom(func_name), args)
   end
 
 end

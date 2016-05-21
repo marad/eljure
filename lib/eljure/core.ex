@@ -38,6 +38,8 @@ defmodule Eljure.Core do
       "macro?" => function(&macro?/1, nil),
       "function?" => function(&function?/1, nil),
       "apply" => function(&apply_func/1,nil),
+      "rest" => function(&rest/1,nil),
+      "count" => function(&count/1,nil),
     }
   end
 
@@ -181,6 +183,15 @@ defmodule Eljure.Core do
     end
   end
 
+  def rest args do
+    case args do
+      [] -> raise ArityError
+      [_, _ | _] -> raise ArityError
+      [vector([],_)] -> vector([],nil)
+      [vector([_ | tail],_)] -> vector(tail,nil)
+    end
+  end
+
   def nil? [nil] do bool(true, nil) end
   def nil? _ do bool(false, nil) end
 
@@ -214,4 +225,14 @@ defmodule Eljure.Core do
 
   def function? [function(_, _)] do bool(true, nil) end
   def function? _ do bool(false, nil) end
+
+  def count args do
+    case args do
+      [] -> raise ArityError
+      [x, y] -> raise ArityError
+      [nil] -> int(0,nil)
+      [list(l,_)] -> int(length(l), nil)
+      [vector(v,_)] -> int(length(v), nil)
+    end
+  end
 end
