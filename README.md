@@ -20,3 +20,8 @@ Eljure is general purpose Clojure-like programming language for Erlang's virtual
 
   to execute Eljure program.
 
+
+# Development
+
+Eljure has currently very limited functionality, but with destructuring and interop with elixir I believe it can
+already be usable.
